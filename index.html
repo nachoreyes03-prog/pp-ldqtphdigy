@@ -7703,7 +7703,14 @@ const guardKick = function guardKick(rel, wk) {
 }
 // with DevTools open the game keeps pausing, so nobody can hook into it while playing.
 // (Getting past it means switching breakpoints off, and the hooking trick needs them on.) Not on the test server.
-if (location.hostname !== 'localhost') setInterval(() => { try { Function('debugger')(); } catch (e) { /* eval blocked: plain one */ debugger; } }, 400);   // eslint-disable-line no-debugger
+// (a fresh one each time can't be muted with "never pause here"; where the page forbids that, after one try it's the plain one)
+if (location.hostname !== 'localhost') {
+  let fresh = true;
+  setInterval(() => {
+    if (fresh) { try { Function('debugger')(); return; } catch (e) { fresh = false; } }
+    debugger;   // eslint-disable-line no-debugger
+  }, 400);
+}
 })();
 </script>
 <script>
