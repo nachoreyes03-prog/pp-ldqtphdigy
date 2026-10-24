@@ -360,21 +360,6 @@ body {
 .title .shop { margin-top: 10px; gap: 8px; height: 40px; padding: 0 18px; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
 .title .shop svg { width: 15px; height: 15px; }
 .title .shop .arr { width: 12px; height: 12px; opacity: .8; }
-.screen.store { justify-content: flex-start; padding-block: 0; background: linear-gradient(180deg, rgba(21, 18, 28, .78) 0%, rgba(21, 18, 28, .35) 30%, rgba(21, 18, 28, 0) 50%, rgba(21, 18, 28, 0) 66%, rgba(21, 18, 28, .82) 100%); }
-.store .topbar .rec.plata { margin-left: auto; }
-.store-title { margin: clamp(64px, calc(var(--px) * 30), 130px) 0 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, calc(var(--px) * 13), 54px); color: var(--sol); letter-spacing: .04em; text-shadow: 0 3px 0 #6b4a00, 3px 3px 0 #6b4a00, 0 6px 0 rgba(0, 0, 0, .35); }
-.store-sub { color: var(--chalk); font-size: 14px; max-width: 300px; text-wrap: balance; opacity: .9; }
-.store-bottom { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: grid; gap: 10px; justify-items: center; width: min(92%, 380px); }
-.store-tabs { display: flex; gap: 4px; background: rgba(21, 18, 28, .72); padding: 4px; border-radius: 999px; }
-.store-tabs button { border: 0; cursor: pointer; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 999px; }
-.store-tabs button.on { background: var(--sol); color: var(--ink); }
-.store-tabs button:focus-visible { outline: 2px solid var(--sol); outline-offset: 2px; }
-.store-row { background: rgba(21, 18, 28, .72); border-radius: 999px; padding: 4px; }
-.store-row .shoe-txt { min-width: 176px; }
-#store-buy { min-width: 220px; background: var(--sol); color: var(--ink); --pour-text: var(--ink); }
-#store-buy:hover { background: #ffcb21; }
-#store-buy.owned { background: var(--soft); color: var(--chalk); }
-#store-buy.blocked { filter: grayscale(1); opacity: .6; }
 .plata-run { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #9fe39a; }
 .pour-btn.cont { position: relative; overflow: hidden; background: var(--sol); color: var(--ink); --pour-text: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .03em; }
 .pour-btn.cont:hover { background: #ffcb21; }
@@ -382,6 +367,95 @@ body {
 .pour-btn.cont .cd { position: absolute; left: 0; bottom: 0; height: 4px; width: 100%; background: rgba(21, 18, 28, .45); transform-origin: left; transform: scaleX(1); }
 .pour-btn.cont.counting .cd { animation: contCd 7s linear forwards; }
 @keyframes contCd { to { transform: scaleX(0); } }
+
+/* ---------- bigger buttons and text all over (they were small on a phone) ---------- */
+.pour-btn { height: 48px; padding: 0 20px; font-size: 17px; }
+.pour-btn.icon { width: 48px; padding: 0; }
+.pour-btn svg { width: 20px; height: 20px; }
+.pour-btn.main { height: 58px; padding: 0 36px; font-size: 20px; }
+.pour-btn.play { font-size: 22px; }
+.pour-btn.play svg { width: 17px; height: 17px; }
+.title .shop { height: 52px; padding: 0 26px; font-size: 18px; margin-top: 12px; }
+.title .shop svg { width: 20px; height: 20px; }
+.title .shop .arr { width: 15px; height: 15px; }
+.title .shoe-txt { min-width: 150px; }
+.title .shoe-txt b { font-size: 17px; }
+.title .shoe-txt small { font-size: 13px; }
+.rec { font-size: 16px; padding: 9px 15px; }
+.rec .bill { width: 24px; height: 13px; }
+.hud-plata { top: 72px; font-size: 21px; padding: 7px 14px 7px 11px; gap: 9px; }
+.hud-plata .bill { width: 30px; height: 17px; }
+.pour-btn.cont { font-size: 18px; }
+.plata-run { font-size: 17px; }
+
+/* ---------- the shop: a Clash-style card grid dressed up as a classic Argentine newspaper kiosk ---------- */
+.kiosk *, .kiosk *::before, .kiosk *::after { box-sizing: border-box; }
+.screen.kiosk { padding: 0; gap: 0; justify-content: flex-start; align-items: stretch; overflow: hidden; background: #1c4d33; }
+.screen.kiosk > * { max-width: none; }
+.kiosk-top { position: relative; flex: none; display: flex; align-items: center; justify-content: center; padding: 12px 70px 10px; background: linear-gradient(#348857, #22603c); border-bottom: 4px solid #143b25; box-shadow: inset 0 2px 0 rgba(255, 255, 255, .18); }
+/* the green lit sign over the kiosk */
+.kiosk-sign { display: grid; justify-items: center; gap: 3px; padding: 7px 20px 8px; background: linear-gradient(#59d684, #36b862); border: 3px solid #0f3a22; border-radius: 6px; box-shadow: 0 0 22px rgba(120, 255, 160, .45), inset 0 -3px 0 rgba(0, 0, 0, .16); }
+.kiosk-sign b { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, calc(var(--px) * 13), 48px); color: #fff; letter-spacing: .06em; line-height: 1;
+  text-shadow: 3px 0 0 #0f3a22, -3px 0 0 #0f3a22, 0 3px 0 #0f3a22, 0 -3px 0 #0f3a22, 3px 3px 0 #0f3a22, -3px 3px 0 #0f3a22, 3px -3px 0 #0f3a22, -3px -3px 0 #0f3a22, 0 6px 0 rgba(0, 0, 0, .3); }
+.kiosk-sign small { font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: .12em; color: #0f3a22; }
+.kiosk-x { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border: 3px solid #5a0f12; border-radius: 11px; background: linear-gradient(#ff6a5e, #d42a22); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .25), 0 3px 0 rgba(0, 0, 0, .35); }
+.kiosk-x svg { width: 22px; height: 22px; }
+.kiosk-x:active { transform: translateY(calc(-50% + 2px)); }
+.kiosk-x:focus-visible, .kd-x:focus-visible, .kd-buy:focus-visible { outline: 3px solid var(--sol); outline-offset: 3px; }
+/* green and white awning with a scalloped edge */
+.kiosk-awning { position: relative; z-index: 1; flex: none; height: 30px; background: repeating-linear-gradient(90deg, #2f9a5a 0 36px, #f4f1e6 36px 72px); box-shadow: inset 0 6px 0 rgba(0, 0, 0, .12); }
+.kiosk-awning::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 15px;
+  background: radial-gradient(circle at 18px 0, #2f9a5a 17px, transparent 18px) 0 0 / 72px 15px repeat-x, radial-gradient(circle at 54px 0, #f4f1e6 17px, transparent 18px) 0 0 / 72px 15px repeat-x;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .22)); }
+/* the money bar, like the token bar in Clash */
+.kiosk-bar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 24px 14px 11px; background: linear-gradient(#f8bd42, #e8901c); border-bottom: 4px solid #a85a0c; }
+.kiosk-money { display: inline-flex; align-items: center; gap: 11px; background: rgba(110, 46, 0, .32); padding: 7px 18px 7px 11px; border-radius: 999px; box-shadow: inset 0 3px 0 rgba(0, 0, 0, .2); }
+.kiosk-money .bill { width: 38px; height: 21px; }
+.kiosk-money b { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #fff; font-variant-numeric: tabular-nums;
+  text-shadow: 2px 0 0 #6b2e00, -2px 0 0 #6b2e00, 0 2px 0 #6b2e00, 0 -2px 0 #6b2e00, 0 4px 0 rgba(0, 0, 0, .25); }
+.kiosk-open { font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .06em; color: #fff; background: #d42a22; padding: 6px 10px; border: 2px solid #fff; border-radius: 6px; transform: rotate(-4deg); box-shadow: 0 2px 0 rgba(0, 0, 0, .3); }
+/* the shelves: newsprint, with the kiosk's green frame down both sides */
+.kiosk-shelf { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 14px 20px;
+  background: repeating-linear-gradient(0deg, transparent 0 7px, rgba(21, 18, 28, .035) 7px 8px), #efe8d8;
+  box-shadow: inset 7px 0 0 #2f7d4f, inset -7px 0 0 #2f7d4f; }
+.kiosk-head { margin: 16px 2px 14px; text-align: left; font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .1em; color: #15121c; border-bottom: 4px double #15121c; padding-bottom: 4px; }
+.kiosk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 10px; }
+/* each item is a magazine hanging from a clothespin */
+.kcard { position: relative; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr); min-width: 0; gap: 4px; padding: 0 0 10px; margin: 0; border: 3px solid #15121c; border-radius: 6px; background: #fbf8f0;
+  cursor: pointer; box-shadow: 0 5px 0 rgba(21, 18, 28, .3); text-align: center; color: #15121c; font: inherit; -webkit-tap-highlight-color: transparent; transition: transform .08s ease-out; }
+.kcard:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(21, 18, 28, .3); }
+.kcard:focus-visible { outline: 3px solid var(--sol); outline-offset: 3px; }
+.kc-clip { position: absolute; top: -12px; left: 50%; width: 12px; height: 22px; margin-left: -6px; z-index: 1; background: linear-gradient(90deg, #b98a4c, #e8c48a 45%, #b98a4c); border: 2px solid #5a3a14; border-radius: 3px; }
+.kc-mast { display: grid; place-items: center; min-height: 2.7em; padding: 9px 4px 6px; background: var(--mast); color: var(--mast-ink); border-bottom: 3px solid #15121c; border-radius: 3px 3px 0 0;
+  font-family: var(--font-display); font-weight: 700; font-size: 11px; line-height: 1.1; letter-spacing: .02em; text-transform: uppercase; }
+.kc-icon { display: grid; place-items: center; padding: 2px 4px; }
+.kc-icon canvas { width: 100%; max-width: 92px; height: auto; aspect-ratio: 1; image-rendering: pixelated; }
+.kc-price { justify-self: center; max-width: calc(100% - 8px); display: inline-flex; align-items: center; gap: 4px; padding: 5px 6px; background: #ffd447; border: 2px solid #15121c; border-radius: 6px; transform: rotate(-3deg);
+  font-family: var(--font-display); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; box-shadow: 0 2px 0 rgba(0, 0, 0, .3); white-space: nowrap; }
+.kc-price .bill { width: 18px; height: 10px; }
+.kcard.poor .kc-price { color: #b8261f; }
+.kcard.own .kc-price { background: #a8e8a2; }
+.kcard.on { box-shadow: 0 0 0 4px #3fbf6a, 0 5px 0 rgba(21, 18, 28, .3); }
+.kcard.on .kc-price { background: #3fbf6a; color: #fff; }
+/* the chalkboard at the bottom */
+.kiosk-board { flex: none; padding: 13px 16px calc(13px + env(safe-area-inset-bottom)); background: #26322d; color: #f2efe6; border-top: 6px solid #6b4a24; font-family: var(--font-body); font-size: 17px; text-align: center; text-shadow: 0 0 2px rgba(255, 255, 255, .35); }
+/* tapping a magazine opens it big */
+.kiosk-detail { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 20px; background: rgba(10, 8, 14, .66); }
+.kd-card { position: relative; width: min(100%, 330px); display: grid; justify-items: center; gap: 12px; padding: 0 0 20px; background: #fbf8f0; border: 4px solid #15121c; border-radius: 12px; box-shadow: 0 9px 0 rgba(0, 0, 0, .35); color: #15121c; }
+.kd-card.bought { animation: kdBought .5s ease-out; }
+@keyframes kdBought { 0% { scale: 1; } 30% { scale: 1.08; } 100% { scale: 1; } }
+.kd-mast { width: 100%; padding: 15px 60px 13px; background: var(--mast, #d23a3a); border-bottom: 4px solid #15121c; border-radius: 8px 8px 0 0; }
+.kd-mast b { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1.1; color: #fff; text-shadow: 2px 0 0 #15121c, -2px 0 0 #15121c, 0 2px 0 #15121c, 0 -2px 0 #15121c, 0 4px 0 rgba(0, 0, 0, .3); }
+.kd-icon canvas { width: 184px; height: 184px; image-rendering: pixelated; }
+.kd-desc { margin: 0; padding: 0 20px; font-size: 17px; line-height: 1.3; text-wrap: balance; }
+.kd-buy { min-width: 250px; height: 60px; padding: 0 22px; border: 3px solid #15121c; border-radius: 13px; background: linear-gradient(#ffe066, #ffc21f); color: #15121c; cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; font-size: 19px; box-shadow: inset 0 -5px 0 rgba(0, 0, 0, .18), 0 4px 0 rgba(0, 0, 0, .35); }
+.kd-buy:active { transform: translateY(2px); }
+.kd-buy.blocked { filter: grayscale(1); opacity: .6; }
+.kd-buy.owned { background: linear-gradient(#7fe08a, #3fbf6a); color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); }
+.kd-x { position: absolute; top: 9px; right: 9px; width: 42px; height: 42px; border: 3px solid #5a0f12; border-radius: 10px; background: linear-gradient(#ff6a5e, #d42a22); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25); }
+.kd-x svg { width: 18px; height: 18px; }
+@media (prefers-reduced-motion: reduce) { .kd-card.bought { animation-duration: .2s; } .kcard { transition: none; } }
 </style>
 <div id="app">
   <div id="stage">
@@ -458,25 +532,26 @@ body {
       <button class="pour-btn soft" id="btn-quit" type="button">Salir al menú</button>
     </section>
 
-    <section id="scr-store" class="screen store" hidden aria-label="Tienda">
-      <div class="topbar">
-        <button class="pour-btn icon" id="store-back" type="button" aria-label="Volver al inicio"><span class="ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="square"/></svg></span></button>
-        <p class="rec plata" aria-label="Tu plata"><span class="bill" aria-hidden="true"></span><span id="store-plata">$ 0</span></p>
+    <section id="scr-store" class="screen kiosk" hidden aria-label="Kiosco">
+      <header class="kiosk-top">
+        <div class="kiosk-sign"><b>KIOSCO</b><small>DIARIOS · REVISTAS · PELOTAS</small></div>
+        <button class="kiosk-x" id="store-back" type="button" aria-label="Cerrar el kiosco"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="3" stroke-linecap="square"/></svg></button>
+      </header>
+      <div class="kiosk-awning" aria-hidden="true"></div>
+      <div class="kiosk-bar">
+        <div class="kiosk-money"><span class="bill"></span><b id="store-plata">$ 0</b></div>
+        <div class="kiosk-open" aria-hidden="true">ABIERTO</div>
       </div>
-      <h2 class="store-title">TIENDA</h2>
-      <p class="store-sub">Cosas que solo se consiguen acá, con la plata que se le cae a la gente</p>
-      <div class="store-bottom">
-        <div class="store-tabs" role="tablist" aria-label="Categoría">
-          <button type="button" role="tab" data-cat="stone">Pelotas</button>
-          <button type="button" role="tab" data-cat="fit">Ropa</button>
-          <button type="button" role="tab" data-cat="shoe">Calzado</button>
+      <div class="kiosk-shelf" id="store-grid"></div>
+      <div class="kiosk-board">Juntá plata pegándole a la gente con la piedra</div>
+      <div class="kiosk-detail" id="store-detail" hidden>
+        <div class="kd-card" id="store-detail-card" role="dialog" aria-modal="true" aria-labelledby="store-detail-name">
+          <button class="kd-x" id="store-detail-close" type="button" aria-label="Cerrar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="3" stroke-linecap="square"/></svg></button>
+          <div class="kd-mast"><b id="store-detail-name">—</b></div>
+          <div class="kd-icon" id="store-detail-icon"></div>
+          <p class="kd-desc" id="store-detail-desc"></p>
+          <button class="kd-buy" id="store-buy" type="button">Comprar</button>
         </div>
-        <div class="shoes store-row">
-          <button class="pour-btn icon" id="store-prev" type="button" aria-label="Anterior"><span class="ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="square"/></svg></span></button>
-          <div class="shoe-txt" aria-live="polite"><b id="store-name">—</b><small id="store-count"></small></div>
-          <button class="pour-btn icon" id="store-next" type="button" aria-label="Siguiente"><span class="ic"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="square"/></svg></span></button>
-        </div>
-        <button class="pour-btn main" id="store-buy" type="button">Comprar</button>
       </div>
     </section>
 
@@ -5536,8 +5611,8 @@ const SKIN_DOT = { papel: [236, 234, 226], lata: [196, 40, 48], botella: [90, 18
 const DOTSH = { c: [0, 0, 0], px(nu, nv, nz) { const l = 0.55 + 0.5 * Math.max(0, -nv * 0.6 + nz * 0.6), c = this.c; return tc(c[0] * l, c[1] * l, c[2] * l); } };
 function skinId() { const i = game.state === 'title' && stoneView >= 0 ? stoneView : game.stoneSkin; return (STONES[i] || STONES[0]).id; }
 // draws whatever you're kicking; also used when a cop or a dog has it
-function drawSkin(x, y, Rp, z, rx, rz, s) {
-  const id = skinId();
+function drawSkin(x, y, Rp, z, rx, rz, s, forceId) {   // forceId: draw that one (shop icons)
+  const id = forceId || skinId();
   if (id === 'piedra') return drawSphere(x, y, Rp, z, rx, rz, STONESH);
   if (Rp < 1.8) { DOTSH.c = SKIN_DOT[id]; return drawSphere(x, y, Rp * 1.1, z, 0, 0, DOTSH); }   // far away: just a dot of its colour
   if (id === 'papel') return drawSphere(x, y, Rp * 1.08, z, rx, rz, PAPERSH);
@@ -6519,9 +6594,11 @@ function cashPieces(amount, kind) {
     const n = Math.max(1, Math.min(6, Math.round(amount / 200))), each = Math.floor(amount / n / 100) * 100;
     return Array.from({ length: n }, (_, i) => ({ v: i === n - 1 ? amount - each * (n - 1) : each, kind: 'coin' }));
   }
+  // bills for most of it, and always a handful of coins jingling out too ($1.000 worth, in five)
   const out = [];
-  let left = amount;
-  for (const [v, col] of BILLS) while (left >= v && out.length < 7) { out.push({ v, kind: 'bill', col }); left -= v; }
+  for (let k = 0; k < 5; k++) out.push({ v: 200, kind: 'coin' });
+  let left = amount - 1000;
+  for (const [v, col] of BILLS) while (left >= v && out.length < 12) { out.push({ v, kind: 'bill', col }); left -= v; }
   if (left > 0 && out.length) out[out.length - 1].v += left;   // whatever's left rides on the last bill
   return out;
 }
@@ -6559,7 +6636,7 @@ function updateCash(dt) {
       else c.vy -= 9.8 * dt;
       c.x += c.vx * dt; c.y += c.vy * dt; c.z += c.vz * dt; c.sp += dt * (c.kind === 'bill' ? 9 : 15);
       if (c.y < 0.02) { c.y = 0.02; if (c.kind === 'bill') { c.vy = 0; c.vx = c.vz = 0; } else { c.vy = Math.abs(c.vy) * 0.4; c.vx *= 0.6; c.vz *= 0.6; } }
-      if (c.t > 0.55 || c.z < cam.z + 0.6) c.fly = proj(c.x, c.y, c.z, PA) ? { x0: PA.x, y0: PA.y, t: 0 } : { x0: HW, y0: H * 0.75, t: 0 };   // ...and off into your pocket
+      if (c.t > 0.9 || c.z < cam.z + 0.6) c.fly = proj(c.x, c.y, c.z, PA) ? { x0: PA.x, y0: PA.y, t: 0 } : { x0: HW, y0: H * 0.75, t: 0 };   // ...and off into your pocket
     } else {
       c.fly.t += dt / 0.42;
       if (c.fly.t >= 1) { c.done = true; bankPiece(c.v, true); }
@@ -6584,7 +6661,7 @@ function plataHUD(bump) {
 // a bill: a little rectangle (seen flat it flutters, so it narrows and widens), a coin: a disc that flips
 function cashSprite(x, y, s, c, z, ang) {
   if (c.kind === 'bill') {
-    const hw = Math.max(2, 0.075 * s), hh = Math.max(1, 0.036 * s * (0.35 + 0.65 * Math.abs(Math.cos(c.sp)))), ca = Math.cos(ang), sa = Math.sin(ang);
+    const hw = Math.max(3, 0.12 * s), hh = Math.max(1.5, 0.058 * s * (0.35 + 0.65 * Math.abs(Math.cos(c.sp)))), ca = Math.cos(ang), sa = Math.sin(ang);
     const pt = (dx, dy) => [x + dx * ca - dy * sa, y + dx * sa + dy * ca];
     const col = c.col, edge = tc(col[0] * 0.55, col[1] * 0.55, col[2] * 0.55);
     poly([...pt(-hw, -hh), ...pt(hw, -hh), ...pt(hw, hh), ...pt(-hw, hh)], edge, z);
@@ -6592,7 +6669,7 @@ function cashSprite(x, y, s, c, z, ang) {
     if (hw > 4) ellipse(x + ca * hw * 0.45, y + sa * hw * 0.45, Math.max(1, hh * 0.45), Math.max(1, hh * 0.45), tc(244, 240, 220), z - 0.0002);   // the watermark circle
     return;
   }
-  const r = Math.max(1.2, (c.kind === 'gold' ? 0.05 : 0.035) * s), fl = 0.3 + 0.7 * Math.abs(Math.cos(c.sp));
+  const r = Math.max(2, (c.kind === "gold" ? 0.085 : 0.058) * s), fl = 0.3 + 0.7 * Math.abs(Math.cos(c.sp));
   const C = c.kind === 'gold' ? [250, 204, 60] : [206, 206, 196], E = c.kind === 'gold' ? [150, 104, 20] : [120, 118, 110];
   ellipse(x, y, r * fl, r, tc(C[0], C[1], C[2]), z, tc(E[0], E[1], E[2]));
   if (r > 2.5) pset(x - r * 0.3 * fl, y - r * 0.3, tc(255, 255, 240), z - 0.001);
@@ -6606,7 +6683,7 @@ function drawCash(flying) {
     if (!flying) { if (!proj(c.x, c.y, c.z, PA)) continue; prepTint(c.x, c.z, PA.z); cashSprite(PA.x, PA.y, PA.s, c, PA.z - 0.01, c.sp * 0.4); continue; }
     TLr = TLg = TLb = 1; TF = 0;
     const u = c.fly.t, e = u * u * (3 - 2 * u), x = lerp(c.fly.x0, T.x, e), y = lerp(c.fly.y0, T.y, e) - Math.sin(u * Math.PI) * 24;
-    cashSprite(x, y, 90 * (1 - u * 0.5), c, -1, c.sp + u * 6);
+    cashSprite(x, y, 150 * (1 - u * 0.45), c, -1, c.sp + u * 6);
   }
 }
 
@@ -6619,53 +6696,175 @@ function contPrice() {
 }
 function canContinue() { return !!game.run && (game.run.continues || 0) < CONT_MAX; }
 
-// ---------- the shop ----------
-const STORE = { open: false, cat: 'stone', i: 0 };
+
+// ---------- shop icons: each item on its own, drawn with the game's own pixel shaders ----------
+// (the renderer's buffers are swapped for a small one while an icon is drawn)
+const IPX = 64, IPX_CACHE = {};
+function withIconBuffer(draw) {
+  const cvs = document.createElement('canvas'); cvs.width = IPX; cvs.height = IPX;
+  const c2 = cvs.getContext('2d'), id = c2.createImageData(IPX, IPX);
+  const sv = { buf, zbuf, W, HW, OUT, KSH, SK: SKIN.slice(), g: GREYOUT, d: stone.dirty, ls: LIMB_SCALE, side: LEGSIDE };
+  buf = new Uint32Array(id.data.buffer); zbuf = new Float32Array(IPX * IPX).fill(1e9); W = IPX; HW = IPX / 2;
+  TLr = TLg = TLb = 1; TF = 0; GREYOUT = false; stone.dirty = 0; LIMB_SCALE = 1;
+  SKIN[0] = 232; SKIN[1] = 178; SKIN[2] = 136;
+  try { draw(); } finally {
+    buf = sv.buf; zbuf = sv.zbuf; W = sv.W; HW = sv.HW; OUT = sv.OUT; KSH = sv.KSH; GREYOUT = sv.g; stone.dirty = sv.d; LIMB_SCALE = sv.ls; LEGSIDE = sv.side;
+    SKIN[0] = sv.SK[0]; SKIN[1] = sv.SK[1]; SKIN[2] = sv.SK[2];
+  }
+  c2.putImageData(id, 0, 0);
+  return cvs;
+}
+const ishade = (c, l) => tc(c[0] * l, c[1] * l, c[2] * l);
+function iconBall(id) { const m = id === 'mate'; return withIconBuffer(() => drawSkin(32, m ? 39 : 33, m ? 17 : 21, 0.5, 0.7, 0.35, null, id)); }   // the mate is shorter so its bombilla fits
+// clothes laid out flat: the shirt (with its print) and the shorts or trousers under it
+function iconOutfit(o) {
+  return withIconBuffer(() => {
+    OUT = o;
+    if (o.skinCol) { SKIN[0] = o.skinCol[0]; SKIN[1] = o.skinCol[1]; SKIN[2] = o.skinCol[2]; }
+    const long = !!o.long, bare = o.skinTop || o.naked, top = bare ? 99 : 6, legEnd = bare ? 50 : long ? 62 : 52, waist = bare ? 14 : 36;   // swim trunks alone: bigger, in the middle
+    for (let y = 0; y < IPX; y++) for (let x = 0; x < IPX; x++) {
+      const i = y * IPX + x, dx = x - 31.5;
+      // shirt: body, sleeves out to the sides, a neck opening
+      if (y >= top && y < waist + 2) {
+        const sleeve = y < top + 13 && Math.abs(dx) < 27 - (y - top) * 0.15 && Math.abs(dx) >= 13;
+        const body = Math.abs(dx) < 14;
+        const neck = y < top + 4 && Math.abs(dx) < 6 - (y - top);
+        if ((body || sleeve) && !neck) {
+          const c = sleeve && !o.slvPat ? o.sleeve : shirtCol(dx * 4, (y - top) * 1.6);
+          const edge = (body && Math.abs(dx) > 12.8) || y === waist + 1 || (sleeve && (y === top + 12 || Math.abs(dx) > 25.8 - (y - top) * 0.15));
+          buf[i] = edge ? ishade(c, 0.55) : ishade(c, 1.02 - Math.abs(dx) * 0.006 - (y - top) * 0.003);
+          continue;
+        }
+      }
+      // shorts or trousers: the waistband, then two legs with a gap between them
+      if (y >= waist && y < legEnd) {
+        const u = (y - waist) / (legEnd - waist), half = (bare ? 18 : 12) + u * 1.5, gap = y > waist + 7 ? 1.5 : -1, ax = Math.abs(dx);
+        if (ax < half && ax > gap) {
+          LEGSIDE = dx < 0 ? -1 : 1;
+          const v = clamp((ax - gap - (half - gap) / 2) / ((half - gap) / 2), -1, 1);
+          const edge = ax > half - 1 || (gap > 0 && ax < gap + 1) || y === legEnd - 1;
+          buf[i] = shortsShade(u, v * LEGSIDE, edge, 40);
+        }
+      }
+    }
+  });
+}
+// a pair of shoes seen from above, toes up, the left one a bit lower
+function iconShoe(s) {
+  return withIconBuffer(() => {
+    KSH = s;
+    const len = Math.min(52, 34 * (s.len || 1)), hw = 7.6 * (s.wide || 1);
+    for (const [side, x, y] of [[-1, 21, 60], [1, 43, 56]]) {
+      drawShoe(x, y, x + side * 2, y - len, hw, side);
+      if (s.boot) limb(x, y - 3, hw * 0.95, x, y - 7, hw * 0.85, bootShade);   // the shaft, seen from above
+    }
+  });
+}
+function itemIcon(cat, it) {
+  const k = cat + ':' + it.id;
+  if (!IPX_CACHE[k]) IPX_CACHE[k] = cat === 'stone' ? iconBall(it.id) : cat === 'fit' ? iconOutfit(it) : iconShoe(it);
+  const c = document.createElement('canvas'); c.width = IPX; c.height = IPX; c.getContext('2d').drawImage(IPX_CACHE[k], 0, 0);   // a copy: the same icon can sit on a card and in the popup
+  return c;
+}
+
+// ---------- the shop: a classic newspaper kiosk ----------
+const STORE = { open: false, sel: null };
 const STORE_CATS = { stone: () => STONES, fit: () => OUTFITS, shoe: () => SHOES };
+const STORE_HEAD = { stone: 'PELOTAS', fit: 'ROPA', shoe: 'CALZADO' };
+const STORE_DESC = {
+  tenis: 'Rebota que da gusto.', trapo: 'Hecha con medias viejas, como en el potrero.', alfajor: 'Triple, de dulce de leche. No te lo comas.',
+  mate: 'Con bombilla y todo. Cuidado que se vuelca la yerba.', rugby: 'Pica para cualquier lado.', pelotaoro: 'La que todos quieren.',
+  malla: 'Para la pileta de lona. En cuero, con flores.', camuflado: 'Para pasar desapercibido en la plaza.', lenador: 'Camisa a cuadros y jean.',
+  dino: 'Un disfraz de dinosaurio verde, con panza a rayas.', traje: 'Saco, camisa y corbata roja. Para el casamiento del primo.', arcoiris: 'Todos los colores juntos.',
+  crocs: 'Con agujeritos. Cómodas, eso sí.', aletas: 'Patas de rana para la pileta del club.', cowboy: 'Botas de cuero con costuras.',
+  luces: 'La suela se prende de colores.', payaso: 'Enormes. No entran en ningún colectivo.', astronauta: 'Botas blancas de la luna.',
+};
 function storeItems(cat) { const L = STORE_CATS[cat](); const out = []; L.forEach((it, idx) => { if (it.price) out.push({ it, idx }); }); return out; }
 function equipped(cat, idx) { return cat === 'stone' ? game.stoneSkin === idx : cat === 'fit' ? game.outfit === idx : game.shoe === idx; }
 function equip(cat, idx) {
   const L = STORE_CATS[cat](), id = L[idx].id;
-  if (cat === 'stone') { game.stoneSkin = idx; store.set('stoneId', id); }
-  else if (cat === 'fit') { game.outfit = idx; store.set('outfitId', id); }
-  else { game.shoe = idx; store.set('shoeId', id); }
+  if (cat === 'stone') { game.stoneSkin = idx; stoneView = idx; store.set('stoneId', id); }
+  else if (cat === 'fit') { game.outfit = idx; outfitView = idx; store.set('outfitId', id); }
+  else { game.shoe = idx; shoeView = idx; store.set('shoeId', id); }
+}
+const MAST = { stone: ['#d23a3a', '#ffd447'], fit: ['#2f6fd0', '#ffffff'], shoe: ['#7a3fb8', '#ffd447'] };   // each section has its own magazine masthead colours
+function storeBuild() {
+  const grid = $('store-grid'); grid.replaceChildren();
+  for (const cat of ['stone', 'fit', 'shoe']) {
+    const h = document.createElement('h3'); h.className = 'kiosk-head'; h.textContent = STORE_HEAD[cat]; grid.append(h);
+    const g = document.createElement('div'); g.className = 'kiosk-grid';
+    for (const { it, idx } of storeItems(cat)) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'kcard'; b.dataset.cat = cat; b.dataset.idx = idx;
+      b.style.setProperty('--mast', MAST[cat][0]); b.style.setProperty('--mast-ink', MAST[cat][1]);
+      const clip = document.createElement('span'); clip.className = 'kc-clip'; clip.setAttribute('aria-hidden', 'true');
+      const mast = document.createElement('span'); mast.className = 'kc-mast'; mast.textContent = it.name;
+      const ic = document.createElement('span'); ic.className = 'kc-icon'; ic.append(itemIcon(cat, it));
+      const tag = document.createElement('span'); tag.className = 'kc-price';
+      b.append(clip, mast, ic, tag);
+      b.addEventListener('click', () => storeDetail(cat, idx));
+      g.append(b);
+    }
+    grid.append(g);
+  }
+  storeRefresh();
+}
+// prices, "tuyo" and "puesto" on every card, and the wallet
+function storeRefresh() {
+  $('store-plata').textContent = fmtPesos(PLATA);
+  for (const b of document.querySelectorAll('.kcard')) {
+    const cat = b.dataset.cat, idx = +b.dataset.idx, it = STORE_CATS[cat]()[idx], own = isUnlocked(it), on = own && equipped(cat, idx), tag = b.querySelector('.kc-price');
+    b.classList.toggle('own', own); b.classList.toggle('on', on); b.classList.toggle('poor', !own && PLATA < it.price);
+    tag.replaceChildren();
+    if (on) tag.textContent = '✓ PUESTO';
+    else if (own) tag.textContent = 'TUYO';
+    else { const bill = document.createElement('span'); bill.className = 'bill'; tag.append(bill, document.createTextNode(Math.round(it.price).toLocaleString('es-AR'))); }
+    b.setAttribute('aria-label', it.name + (on ? ', puesto' : own ? ', ya es tuyo' : ', ' + fmtPesos(it.price)));
+  }
+  if (STORE.sel) storeDetailUI();
 }
 function openStore() {
   if (game.state !== 'title') return;
-  STORE.open = true; STORE.i = 0;
-  showScreen('scr-store'); storeShow(); sfx.ui();
+  STORE.open = true; STORE.sel = null;
+  if (!$('store-grid').children.length) storeBuild(); else storeRefresh();
+  $('store-detail').hidden = true;
+  showScreen('scr-store'); $('store-grid').scrollTop = 0; sfx.ui();
 }
 function closeStore() {
+  if (STORE.sel) { storeDetailClose(); return; }
   STORE.open = false;
-  stoneView = game.stoneSkin; shoeView = game.shoe; outfitView = game.outfit;   // back to what you're wearing
+  stoneView = game.stoneSkin; shoeView = game.shoe; outfitView = game.outfit;
   showScreen('scr-title'); refreshTitle(); sfx.ui();
 }
-function storeTab(cat) { STORE.cat = cat; STORE.i = 0; storeShow(); sfx.ui(); }
-function storeStep(d) { const n = storeItems(STORE.cat).length; STORE.i = (STORE.i + d + n) % n; storeShow(); sfx.ui(); }
-// shows the item on the kid (the title scene keeps playing behind the shop) with its price and what the button does
-function storeShow() {
-  const L = storeItems(STORE.cat), e = L[STORE.i], it = e.it, own = isUnlocked(it), on = own && equipped(STORE.cat, e.idx);
-  stoneView = game.stoneSkin; shoeView = game.shoe; outfitView = game.outfit;
-  if (STORE.cat === 'stone') stoneView = e.idx; else if (STORE.cat === 'fit') outfitView = e.idx; else shoeView = e.idx;
-  $('store-name').textContent = it.name;
-  $('store-count').textContent = (STORE.i + 1) + ' de ' + L.length + (own ? ' · ya es tuyo' : '');
-  $('store-plata').textContent = fmtPesos(PLATA);
-  for (const b of document.querySelectorAll('.store-tabs button')) { const sel = b.dataset.cat === STORE.cat; b.classList.toggle('on', sel); b.setAttribute('aria-selected', sel ? 'true' : 'false'); }
-  const btn = $('store-buy'), short = it.price - PLATA;
+// tapping a magazine: it opens big, with what it is, the price and the button
+function storeDetail(cat, idx) {
+  STORE.sel = { cat, idx };
+  const it = STORE_CATS[cat]()[idx];
+  $('store-detail-icon').replaceChildren(itemIcon(cat, it));
+  $('store-detail-name').textContent = it.name;
+  $('store-detail-desc').textContent = STORE_DESC[it.id] || '';
+  $('store-detail').style.setProperty('--mast', MAST[cat][0]);
+  storeDetailUI();
+  $('store-detail').hidden = false; sfx.ui();
+  $('store-buy').focus({ preventScroll: true });
+}
+function storeDetailUI() {
+  const { cat, idx } = STORE.sel, it = STORE_CATS[cat]()[idx], own = isUnlocked(it), on = own && equipped(cat, idx), short = it.price - PLATA, btn = $('store-buy');
   btn.classList.toggle('blocked', !own && short > 0);
   btn.classList.toggle('owned', on);
-  btn.textContent = on ? 'Puesto' : own ? 'Usar' : short > 0 ? 'Te faltan ' + fmtPesos(short) : 'Comprar · ' + fmtPesos(it.price);
+  btn.textContent = on ? '✓ Puesto' : own ? 'Usar' : short > 0 ? 'Te faltan ' + fmtPesos(short) : 'Comprar · ' + fmtPesos(it.price);
 }
+function storeDetailClose() { STORE.sel = null; $('store-detail').hidden = true; sfx.ui(); }
 function storeBuy() {
-  const L = storeItems(STORE.cat), e = L[STORE.i], it = e.it;
+  if (!STORE.sel) return;
+  const { cat, idx } = STORE.sel, it = STORE_CATS[cat]()[idx];
   if (!isUnlocked(it)) {
     if (PLATA < it.price) { sfx.nope(); buzz(40); const b = $('store-buy'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; }
     PLATA -= it.price; OWNED.push(it.id); savePlata();
     sfx.buy(); buzz([20, 40, 20]);
-    popup('¡' + it.name + '!', 'big', HW, H * 0.34, 1500);
+    const card = $('store-detail-card'); card.classList.remove('bought'); void card.offsetWidth; card.classList.add('bought');
   } else sfx.ui();
-  equip(STORE.cat, e.idx);
-  storeShow();
+  equip(cat, idx);
+  storeRefresh();
 }
 // =====================================================================
 //  VOICES: the user's recordings, retro 8-bit filter (6-bit, ~7 kHz, radio band, short slapback)
@@ -7360,10 +7559,9 @@ $('btn-again').addEventListener('click', startGame);
 $('btn-continue').addEventListener('click', continueRun);
 $('btn-shop').addEventListener('click', openStore);
 $('store-back').addEventListener('click', closeStore);
-$('store-prev').addEventListener('click', () => storeStep(-1));
-$('store-next').addEventListener('click', () => storeStep(1));
 $('store-buy').addEventListener('click', storeBuy);
-for (const b of document.querySelectorAll('.store-tabs button')) b.addEventListener('click', () => storeTab(b.dataset.cat));
+$('store-detail-close').addEventListener('click', storeDetailClose);
+$('store-detail').addEventListener('click', (e) => { if (e.target === $('store-detail')) storeDetailClose(); });   // tapping outside the card closes it
 $('btn-menu').addEventListener('click', () => { sfx.ui(); toTitle(); });
 $('btn-copy').addEventListener('click', copyResult);
 $('btn-pause').addEventListener('click', () => { sfx.ui(); pause(); });
@@ -7420,7 +7618,7 @@ function tick(dt) {
     if (game.streak >= 2) { const b = st.querySelector('b'); const v = 'x' + game.streak; if (b.textContent !== v) b.textContent = v; st.classList.toggle('hot', game.streak >= 5); }
   }
 }
-if (location.hostname === 'localhost') window.__pp = { STORE, openStore, closeStore, storeTab, storeStep, storeBuy, continueRun, dropMoney, contPrice, get PLATA() { return PLATA; }, set PLATA(v) { PLATA = v; savePlata(); }, get OWNED() { return OWNED; }, OUTFITS, SHOES, STONES, ZD, ORDER, isUnlocked, tryStart, sideSwipe, throwStone, smashWave, newBikeZ, newMoto, newMuerte, fitStep, shoeStep, stoneStep, lockedPick, get ACH() { return ACH; }, setAllSkins(v) { ALL_SKINS = v; }, game, P, stone, world, look, cam, doKick, startGame, resetWorld, render, renderWorld, update, zoneAt, KD, tick, get W() { return W; }, O, newVago, newCartonero, fireBarrel, newPerson, startPower, endPower, VOX, personHit, newGiver, juggleTap, tapAt, swipeKick, stuckOn, newBike, AU, silentWav, mediaPlayback, JG, setRunFrom(v) { RUN_FROM = v; },
+if (location.hostname === 'localhost') window.__pp = { STORE, openStore, closeStore, storeDetail, storeBuy, itemIcon, continueRun, dropMoney, contPrice, get PLATA() { return PLATA; }, set PLATA(v) { PLATA = v; savePlata(); }, get OWNED() { return OWNED; }, OUTFITS, SHOES, STONES, ZD, ORDER, isUnlocked, tryStart, sideSwipe, throwStone, smashWave, newBikeZ, newMoto, newMuerte, fitStep, shoeStep, stoneStep, lockedPick, get ACH() { return ACH; }, setAllSkins(v) { ALL_SKINS = v; }, game, P, stone, world, look, cam, doKick, startGame, resetWorld, render, renderWorld, update, zoneAt, KD, tick, get W() { return W; }, O, newVago, newCartonero, fireBarrel, newPerson, startPower, endPower, VOX, personHit, newGiver, juggleTap, tapAt, swipeKick, stuckOn, newBike, AU, silentWav, mediaPlayback, JG, setRunFrom(v) { RUN_FROM = v; },
   warp(z, night) {
     resetWorld(12345);
     P.z = z; world.genZ = Math.floor((z - 4) / 5) * 5; world.lastHazard = z;
