@@ -1826,8 +1826,10 @@ const prepTintN = function prepTintN(x, z, zc, n) {
   let f = (zc - 8.5) * 0.0625; f = f < 0 ? 0 : f > 1 ? 1 : f; TF = f * f;
 }
 let GREYOUT = false;   // the title screen shows a locked item in grey
+let BWK = 0;   // the black-and-white skin: while the kid is drawn he looks like an old film (hard contrast, grain; BWK is this frame's flicker)
 const tc = function tc(r, g, b) {
   if (GREYOUT) { const v = (r * 0.3 + g * 0.59 + b * 0.11) * 0.55 + 46; r = g = b = v; }
+  else if (BWK) { const v = ((r * 0.3 + g * 0.59 + b * 0.11 - 118) * 1.35 + 124 + (Math.random() - 0.5) * 22) * BWK; r = g = b = v; }
   r *= TLr; g *= TLg; b *= TLb;
   r += (look.fog[0] - r) * TF; g += (look.fog[1] - g) * TF; b += (look.fog[2] - b) * TF;
   return pk(r, g, b);
@@ -1943,6 +1945,26 @@ const DK = {
     const dap = vnoise(X * 5 + TIME * 0.08, Z * 5);
     const s = (dap > 0.7 ? 0.1 : 0.5) * Math.min(1, (1 - q) * 2.5) * (1 - look.night);
     CC[0] *= 1 - s * 0.4; CC[1] *= 1 - s * 0.38; CC[2] *= 1 - s * 0.24;
+  },
+  // the shop's poo leaves a brown smear along its path: streaky lengthwise, patchy at the edges
+  trazo(d, lx, lz, X, Z) {
+    const dx = d.bx - d.ax, dz = d.bz - d.az, L2 = dx * dx + dz * dz || 1e-6;
+    let t = ((lx - d.ax) * dx + (lz - d.az) * dz) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const ex = lx - d.ax - dx * t, ez = lz - d.az - dz * t, dist = Math.sqrt(ex * ex + ez * ez);
+    const w = d.w * (0.7 + 0.4 * vnoise(X * 9 + d.ph, Z * 9));
+    if (dist > w) return;
+    const st = fr((ex * dz - ez * dx) / Math.sqrt(L2) * 90 + d.ph);
+    mixc(104, 64, 30, dist > w * 0.7 ? 0.5 : st < 0.3 ? 0.6 : 0.86);
+  },
+  // the spray can's graffiti: a splat, solid in the middle with a second colour inside, speckled spray round the edge
+  grafiti(d, lx, lz, X, Z) {
+    const a = Math.atan2(lz, lx), rr = Math.sqrt(lx * lx + lz * lz) / d.r;
+    const edge = 1 + 0.18 * Math.sin(a * 5 + d.ph) + 0.1 * Math.sin(a * 11 + d.ph * 2);
+    if (rr > edge * 1.3) return;
+    const sp = hT(Math.floor(X * 140), Math.floor(Z * 140));
+    if (rr > edge) { if (sp > 0.78 + (rr - edge) * 0.9) mixc(d.c1[0], d.c1[1], d.c1[2], 0.85); return; }
+    const c = rr < edge * 0.45 * (1 + 0.25 * Math.sin(a * 3 + d.ph * 3)) ? d.c2 : d.c1;
+    mixc(c[0], c[1], c[2], sp < 0.1 ? 0.65 : 0.92);
   },
   mancha(d, lx, lz, X, Z) {
     const q = (lx * lx + lz * lz) * d.ir2; if (q > 1) return;
@@ -4165,7 +4187,15 @@ const SHOES = [
   { id: 'cowboy', name: 'Botas de cowboy', price: 22000, boot: true, cowboy: true, len: 1.15, base: [140, 86, 46], toe: [120, 72, 38], tongue: [140, 86, 46], stripe: [220, 180, 110], lace: [140, 86, 46], sole: [62, 42, 26], heel: [74, 48, 28] },
   { id: 'luces', name: 'Zapatillas con luces', price: 25000, lights: true, base: [246, 246, 248], toe: [250, 250, 252], tongue: [222, 222, 232], stripe: [60, 60, 72], lace: [255, 255, 255], sole: [232, 232, 238], heel: [60, 60, 72] },
   { id: 'payaso', name: 'Zapatos de payaso', price: 30000, len: 1.55, wide: 1.3, shine: true, base: [222, 40, 40], toe: [250, 214, 40], tongue: [222, 40, 40], stripe: [250, 214, 40], lace: [250, 250, 250], sole: [250, 250, 250], heel: [222, 40, 40] },
-  { id: 'astronauta', name: 'Botas de astronauta', price: 40000, boot: true, moon: true, wide: 1.15, base: [238, 238, 242], toe: [222, 222, 228], tongue: [238, 238, 242], stripe: [240, 120, 40], lace: [238, 238, 242], sole: [120, 122, 132], heel: [90, 100, 120] },
+  // each shop costume comes with its own footwear (yours when you buy the costume; not sold on their own)
+  { id: 'astronauta', name: 'Botas de astronauta', set: 'astro', boot: true, moon: true, wide: 1.15, base: [238, 238, 242], toe: [222, 222, 228], tongue: [238, 238, 242], stripe: [240, 120, 40], lace: [238, 238, 242], sole: [120, 122, 132], heel: [90, 100, 120] },
+  { id: 'sabatones', name: 'Botas de armadura', set: 'caballero', armor: true, len: 1.14, wide: 1.06, base: [176, 182, 192], toe: [200, 206, 216], tongue: [176, 182, 192], stripe: [118, 124, 134], lace: [176, 182, 192], sole: [84, 88, 98], heel: [150, 156, 166] },
+  { id: 'rgbzapas', name: 'Zapatillas RGB', set: 'rgb', rgb: true, base: [26, 26, 32], toe: [36, 36, 44], tongue: [30, 30, 38], stripe: [26, 26, 32], lace: [40, 40, 48], sole: [30, 30, 36], heel: [26, 26, 32] },
+  { id: 'censuradas', name: 'Patas censuradas', set: 'censurado', bare: true, mosaic: true, base: [0, 0, 0], toe: [0, 0, 0], tongue: [0, 0, 0], stripe: [0, 0, 0], lace: [0, 0, 0], sole: [0, 0, 0], heel: [0, 0, 0] },
+  { id: 'botinesbyn', name: 'Botines de antes', set: 'byn', base: [28, 28, 30], toe: [28, 28, 30], tongue: [36, 36, 38], stripe: [244, 244, 240], lace: [244, 244, 240], sole: [236, 236, 232], heel: [28, 28, 30], shine: true },
+  { id: 'huesos', name: 'Pies de esqueleto', set: 'esqueleto', bare: true, bonefeet: true, base: [0, 0, 0], toe: [0, 0, 0], tongue: [0, 0, 0], stripe: [0, 0, 0], lace: [0, 0, 0], sole: [0, 0, 0], heel: [0, 0, 0] },
+  { id: 'botasspider', name: 'Botas de Spider-Man', set: 'spiderman', web: true, base: [204, 32, 42], toe: [204, 32, 42], tongue: [204, 32, 42], stripe: [16, 14, 20], lace: [204, 32, 42], sole: [140, 20, 28], heel: [204, 32, 42] },
+  { id: 'patasdino', name: 'Patas de dino', set: 'dino', dinofeet: true, len: 1.28, wide: 1.32, base: [92, 172, 82], toe: [80, 156, 70], tongue: [92, 172, 82], stripe: [244, 236, 204], lace: [92, 172, 82], sole: [56, 114, 50], heel: [92, 172, 82] },
 ];
 // clothes: shirt pattern (stripes / plain / band / sash / dots / flowers), sleeves, shorts (+ side stripe), socks (+ band)
 const OUTFITS = [
@@ -4187,13 +4217,21 @@ const OUTFITS = [
   { id: 'zombie', name: 'Zombie', need: 0, ach: 'ruta6', pat: 'torn', c1: [122, 112, 96], c2: [128, 26, 30], sleeve: [122, 112, 96], shorts: [64, 70, 92], sstripe: null, sock: [150, 150, 128], band: null, rag: true, zombie: true, skinCol: [146, 172, 116] },
   { id: 'adan', name: 'Adán', need: 0, ach: 'campo', pat: 'skin', c1: [232, 178, 136], c2: [232, 178, 136], sleeve: [232, 178, 136], shorts: [232, 178, 136], sstripe: null, sock: [232, 178, 136], band: null, naked: true },
   { id: 'sinpierna', name: 'Sin una pierna', need: 0, ach: 'vuelta', pat: 'plain', c1: [214, 120, 50], c2: [214, 120, 50], sleeve: [214, 120, 50], shorts: [60, 70, 96], sstripe: null, sock: [246, 246, 242], band: null, oneLeg: true },
-  // only in the shop
-  { id: 'malla', name: 'Malla de baño', price: 12000, pat: 'skin', c1: [232, 178, 136], c2: [232, 178, 136], sleeve: [232, 178, 136], shorts: [250, 120, 60], legPat: 'flores', sstripe: null, sock: null, band: null, skinTop: true, noSock: true },
-  { id: 'camuflado', name: 'Camuflado', price: 15000, pat: 'camo', c1: [98, 112, 70], c2: [62, 72, 46], c3: [150, 138, 98], sleeve: [98, 112, 70], slvPat: 'camo', shorts: [98, 112, 70], legPat: 'camo', long: true, sstripe: null, sock: [60, 60, 50], band: null },
-  { id: 'lenador', name: 'Leñador', price: 20000, pat: 'plaid', c1: [190, 44, 44], c2: [34, 30, 34], sleeve: [190, 44, 44], slvPat: 'plaid', shorts: [62, 92, 150], legPat: 'jean', long: true, sstripe: null, sock: [240, 240, 236], band: null },
-  { id: 'dino', name: 'Disfraz de dino', price: 30000, pat: 'dino', c1: [92, 172, 82], c2: [232, 222, 144], sleeve: [92, 172, 82], slvPat: 'scales', shorts: [92, 172, 82], legPat: 'scales', long: true, sstripe: null, sock: [92, 172, 82], band: null },
-  { id: 'traje', name: 'Traje', price: 40000, pat: 'suit', c1: [34, 34, 42], c2: [244, 244, 240], c3: [180, 30, 44], sleeve: [34, 34, 42], shorts: [34, 34, 42], long: true, sstripe: null, sock: [30, 30, 34], band: null },
-  { id: 'arcoiris', name: 'Arcoíris', price: 60000, pat: 'rainbow', c1: [240, 80, 120], c2: [250, 250, 250], sleeve: [250, 200, 60], slvPat: 'rainbow', shorts: [120, 90, 220], legPat: 'rainbow', sstripe: null, sock: [250, 250, 250], band: [250, 80, 160] },
+  // only in the shop: full costumes, each with its own footwear (shoe: the one that comes with it)
+  { id: 'caballero', name: 'Caballero', price: 45000, pat: 'knight', c1: [182, 188, 198], c2: [214, 176, 70], sleeve: [172, 178, 188], slvPat: 'plate', shorts: [168, 174, 184], legPat: 'plate', long: true, metal: true, skinCol: [176, 182, 192], sstripe: null, sock: [168, 174, 184], band: null, shoe: 'sabatones' },
+  { id: 'astro', name: 'Astronauta', price: 50000, pat: 'astro', c1: [236, 236, 240], c2: [58, 62, 74], sleeve: [236, 236, 240], slvPat: 'puffy', shorts: [232, 232, 236], legPat: 'puffy', long: true, glove: true, skinCol: [240, 240, 244], sstripe: null, sock: [236, 236, 240], band: null, shoe: 'astronauta' },
+  { id: 'spiderman', name: 'Spider-Man', price: 55000, pat: 'spider', c1: [204, 32, 42], c2: [38, 66, 176], sleeve: [204, 32, 42], slvPat: 'web', shorts: [38, 66, 176], legPat: 'spider', long: true, web: true, skinCol: [204, 32, 42], sstripe: null, sock: [204, 32, 42], band: null, shoe: 'botasspider' },
+  { id: 'esqueleto', name: 'Esqueleto', price: 40000, pat: 'ribs', c1: [236, 230, 212], c2: [22, 20, 26], sleeve: [236, 230, 212], shorts: [22, 20, 26], sstripe: null, sock: [236, 230, 212], band: null, bones: true, skel: true, skinCol: [236, 230, 212], shoe: 'huesos' },
+  { id: 'rgb', name: 'RGB', price: 60000, pat: 'rgb', c1: [24, 24, 30], c2: [24, 24, 30], sleeve: [24, 24, 30], slvPat: 'rgb', shorts: [24, 24, 30], legPat: 'rgb', long: true, sstripe: null, sock: [24, 24, 30], band: null, shoe: 'rgbzapas' },
+  { id: 'censurado', name: 'Censurado', price: 35000, pat: 'skin', c1: [232, 178, 136], c2: [232, 178, 136], sleeve: [232, 178, 136], shorts: [232, 178, 136], sstripe: null, sock: [232, 178, 136], band: null, naked: true, censor: true, shoe: 'censuradas' },
+  { id: 'byn', name: 'Blanco y negro', price: 30000, pat: 'stripes', c1: [34, 34, 38], c2: [246, 246, 244], sleeve: [34, 34, 38], shorts: [24, 24, 28], sstripe: [240, 240, 240], sock: [246, 246, 242], band: [24, 24, 28], bw: true, shoe: 'botinesbyn' },
+  { id: 'dino', name: 'Disfraz de dino', price: 30000, pat: 'dino', c1: [92, 172, 82], c2: [232, 222, 144], sleeve: [92, 172, 82], slvPat: 'scales', shorts: [92, 172, 82], legPat: 'scales', long: true, sstripe: null, sock: [92, 172, 82], band: null, shoe: 'patasdino' },
+  // no longer sold (whoever bought them keeps them)
+  { id: 'malla', name: 'Malla de baño', price: 12000, old: true, pat: 'skin', c1: [232, 178, 136], c2: [232, 178, 136], sleeve: [232, 178, 136], shorts: [250, 120, 60], legPat: 'flores', sstripe: null, sock: null, band: null, skinTop: true, noSock: true },
+  { id: 'camuflado', name: 'Camuflado', price: 15000, old: true, pat: 'camo', c1: [98, 112, 70], c2: [62, 72, 46], c3: [150, 138, 98], sleeve: [98, 112, 70], slvPat: 'camo', shorts: [98, 112, 70], legPat: 'camo', long: true, sstripe: null, sock: [60, 60, 50], band: null },
+  { id: 'lenador', name: 'Leñador', price: 20000, old: true, pat: 'plaid', c1: [190, 44, 44], c2: [34, 30, 34], sleeve: [190, 44, 44], slvPat: 'plaid', shorts: [62, 92, 150], legPat: 'jean', long: true, sstripe: null, sock: [240, 240, 236], band: null },
+  { id: 'traje', name: 'Traje', price: 40000, old: true, pat: 'suit', c1: [34, 34, 42], c2: [244, 244, 240], c3: [180, 30, 44], sleeve: [34, 34, 42], shorts: [34, 34, 42], long: true, sstripe: null, sock: [30, 30, 34], band: null },
+  { id: 'arcoiris', name: 'Arcoíris', price: 60000, old: true, pat: 'rainbow', c1: [240, 80, 120], c2: [250, 250, 250], sleeve: [250, 200, 60], slvPat: 'rainbow', shorts: [120, 90, 220], legPat: 'rainbow', sstripe: null, sock: [250, 250, 250], band: [250, 80, 160] },
 ];
 // level achievements already won (they unlock the skins above). "&skins=todas" in a test link shows them all
 // the wallet (pesos kept between runs) and what has been bought in the shop
@@ -4205,7 +4243,11 @@ const ACH_PLACE = { costanera: 'la Costanera', corrientes: 'Av. Corrientes', gle
 let ALL_SKINS = /skins=(todas|todos|all)/i.test(location.hash + location.search);   // test links can show every skin
 const ALL_ITEMS = /desbloquea[r]?=(todo|todos|si|1)|todo=desbloqueado/i.test(location.hash + location.search);   // ...or everything: every skin, shoe, outfit and stone
 const hasAch = function hasAch(k) { return ALL_SKINS || ACH.includes(k); }
-const isUnlocked = function isUnlocked(it) { return ALL_ITEMS || (it.price ? OWNED.includes(it.id) : it.ach ? hasAch(it.ach) : game.best >= it.need); }   // shop things are yours once bought
+const isUnlocked = function isUnlocked(it) {   // shop things are yours once bought; a costume's footwear comes with the costume
+  if (ALL_ITEMS || OWNED.includes(it.id)) return true;
+  if (it.set) { const o = OUTFITS.find((f) => f.id === it.set); return !!o && isUnlocked(o); }
+  return it.price ? false : it.ach ? hasAch(it.ach) : game.best >= it.need;
+}
 const lockText = function lockText(it) { return it.ach ? (it.ach === 'vuelta' ? 'Completá la vuelta entera' : 'Llegá a ' + ACH_PLACE[it.ach]) : 'Llegá a ' + it.need + ' m'; }
 // a level was reached for the first time in a real run: its skin is yours
 const winAch = function winAch(k) {
@@ -4226,12 +4268,18 @@ const STONES = [
   { id: 'choripan', name: 'Choripán', need: 1000 },
   { id: 'mundial', name: 'Pelota mundialista', need: 1500 },
   // only in the shop (paid with the pesos people drop)
-  { id: 'tenis', name: 'Pelota de tenis', price: 6000 },
-  { id: 'trapo', name: 'Pelota de trapo', price: 8000 },
+  // things that do something when you kick them
+  { id: 'pila', name: 'Pila AA', price: 20000 },          // sparks fly when you kick it
+  { id: 'pez', name: 'Pescado', price: 15000 },           // splashes water
+  { id: 'popo', name: 'Popó', price: 18000 },             // leaves a smeared trail on the ground
+  { id: 'aerosol', name: 'Aerosol', price: 30000 },       // every kick sprays graffiti on the ground
   { id: 'alfajor', name: 'Alfajor', price: 10000 },
   { id: 'mate', name: 'Mate', price: 15000 },
   { id: 'rugby', name: 'Pelota de rugby', price: 20000 },
   { id: 'pelotaoro', name: 'Pelota de oro', price: 50000 },
+  // no longer sold (whoever bought them keeps them)
+  { id: 'tenis', name: 'Pelota de tenis', price: 6000, old: true },
+  { id: 'trapo', name: 'Pelota de trapo', price: 8000, old: true },
 ];
 const idxOf = (arr, id, d) => { const i = arr.findIndex((s) => s.id === id); return i < 0 ? d : i; };
 
@@ -4696,7 +4744,7 @@ const contact = function contact(K) {
     s.vx = K.freeSide * Math.sqrt(2 * mu * d); s.vz = 0; s.vy = 0; s.curve = 0; s.y = 0; s.floorY = 0; s.held = null;
     s.kickT = TIME; s.kickK = K;
     game.freeT = TIME + 2.5;   // a second tap (quick or not) sends it forward
-    sfx.kick(2.5); dust(s.x, 0, s.z, 4); buzz(14);
+    sfx.kick(2.5); dust(s.x, 0, s.z, 4); buzz(14); ballKickFx(s, 2.5);
     return;
   }
   const bonus = q === 'perfect' ? Math.min(2.2, game.streak * 0.16) : 0;
@@ -4725,7 +4773,7 @@ const contact = function contact(K) {
   s.trail = q === 'perfect' ? 0.5 : K.swiped ? 0.3 : 0; s.held = null;
   s.fire = game.streak >= 5 ? 1.2 : 0;
   // effects
-  sfx.kick(power);
+  sfx.kick(power); ballKickFx(s, power);
   dust(s.x, 0, s.z, 6);
   buzz(q === 'perfect' ? 22 : 12);
   game.shake = Math.max(game.shake, (def.shake ? 1.6 : 0.6) * (power / 5));
@@ -4802,7 +4850,7 @@ const updateStone = function updateStone(dt) {
       } else if (s.vy < -1.1) {
         const imp = -s.vy;
         s.vy = imp * 0.42; s.vx *= 0.84; s.vz *= 0.84;
-        sfx.bounce(imp); dust(s.x, 0, s.z, 2 + (imp | 0));
+        sfx.bounce(imp); dust(s.x, 0, s.z, 2 + (imp | 0)); ballBounceFx(s, imp);
       } else s.vy = 0;
     }
   }
@@ -4826,6 +4874,7 @@ const updateStone = function updateStone(dt) {
   }
   if (s.curve) { s.vx += s.curve * dt * Math.min(1, sp / 2.5); s.curve *= Math.exp(-dt * 2.2); if (Math.abs(s.curve) < 0.05) s.curve = 0; }
   s.x += s.vx * dt; s.z += s.vz * dt;
+  ballTrail(s, grounded, dt);
   s.rz += s.vz * dt / 0.055; s.rx += s.vx * dt / 0.055;
   if (s.lost) return;
   // side bounds
@@ -5304,6 +5353,69 @@ const splash = function splash(x, y, z, n, col) {
   col = col || [176, 214, 240];
   for (let k = 0; k < n; k++) { const a = Math.random() * 6.283, v = 0.5 + Math.random() * 1.6; part(x, y + 0.02, z, Math.cos(a) * v, 1.2 + Math.random() * 2, Math.sin(a) * v, 0.5 + Math.random() * 0.3, col, 0.018, 9.8, 0.5); }
 }
+// ---------- the shop's special balls: what they do when kicked, when they bounce, and as they roll ----------
+const SPARKC = [[255, 250, 200], [255, 220, 90], [150, 220, 255], [255, 255, 255]];
+const GRAFC = [[250, 60, 140], [60, 200, 250], [250, 220, 50], [120, 240, 90], [170, 90, 250], [250, 120, 40]];
+const sparks = function sparks(s, n, v0) { for (let k = 0; k < n; k++) { const a = Math.random() * 6.283, v = v0 * (0.4 + Math.random()); part(s.x, s.y + 0.06, s.z, Math.cos(a) * v, 0.4 + Math.random() * v * 0.7, Math.sin(a) * v, 0.2 + Math.random() * 0.25, pickA(SPARKC), 0.02, 6, 1); } }
+// the battery's little lightning bolts, jumping off it for a moment after a kick (new zigzags every frame, so they flicker)
+const drawZaps = function drawZaps() {
+  const s = stone;
+  if (!(TIME < (s.zapT || 0)) || s.hidden || !proj(s.x, s.y + 0.05, s.z, PC)) return;
+  const len = Math.max(12, PC.s * 0.32), cIn = pk(240, 250, 255), cOut = pk(110, 200, 255);
+  for (let b = 0; b < 4; b++) {
+    let a = Math.random() * 6.283, x = PC.x, y = PC.y;
+    for (let k = 0; k < 5; k++) {
+      a += (Math.random() - 0.5) * 1.6;
+      const nx = x + Math.cos(a) * len / 5, ny = y + Math.sin(a) * len / 5;
+      line(x + 1, y, nx + 1, ny, cOut, -1); line(x, y, nx, ny, cIn, -1);
+      x = nx; y = ny;
+    }
+  }
+}
+const pooBlob = function pooBlob(s, w) { D('trazo', s.x, s.z, w + 0.05, w + 0.05, { ax: -0.025, az: -0.02, bx: 0.025, bz: 0.02, w, ph: Math.random() * 9 }); }
+const graffiti = function graffiti(x, z, r, c1, c2) { D('grafiti', x, z, r * 1.35, r * 1.35, { r, c1, c2, ph: Math.random() * 6.283 }); }
+const ballKickFx = function ballKickFx(s, power) {
+  const id = skinId();
+  if (id === 'pila') { sparks(s, 36, 4); s.zapT = TIME + 0.25; game.flash = Math.max(game.flash, 0.16); sfx.zap(); }   // sparks and little lightning bolts
+  else if (id === 'pez') {   // a big splash of water, and a wet patch on the ground
+    for (let k = 0; k < 34; k++) { const a = Math.random() * 6.283, v = 0.6 + Math.random() * 2.2; part(s.x, s.y + 0.05, s.z, Math.cos(a) * v, 1.4 + Math.random() * 2.6, Math.sin(a) * v, 0.55 + Math.random() * 0.35, k & 1 ? [170, 214, 245] : [230, 245, 255], 0.03, 9.8, 0.5); }
+    const r = 0.22 + Math.random() * 0.12; D('mancha', s.x, s.z, r, r, { ir2: 1 / (r * r) });
+    sfx.splash();
+  }
+  else if (id === 'popo') { pooBlob(s, 0.07); for (let k = 0; k < 8; k++) part(s.x, s.y + 0.04, s.z, (Math.random() - 0.5) * 2, 0.6 + Math.random() * 1.4, (Math.random() - 0.5) * 2, 0.4, [110, 66, 32], 0.016, 9.8, 0.5); }   // splat
+  else if (id === 'aerosol') {   // psssh: a splat of graffiti where you kicked it, then a sprayed line for a moment as it goes
+    const c1 = pickA(GRAFC); let c2 = pickA(GRAFC); if (c2 === c1) c2 = GRAFC[(GRAFC.indexOf(c1) + 2) % GRAFC.length];
+    graffiti(s.x, s.z + 0.05, Math.min(0.38, 0.2 + power * 0.016), c1, c2);
+    s.spray = { t: 0.75, c: c1, x: s.x, z: s.z };
+    sfx.spray();
+  }
+}
+const ballBounceFx = function ballBounceFx(s, imp) {
+  const id = skinId();
+  if (id === 'pila' && imp > 1.5) { sparks(s, 10, 2.5); s.zapT = TIME + 0.1; sfx.zap(0.4); }
+  else if (id === 'pez') { splash(s.x, 0.02, s.z, 5 + (imp * 2 | 0), [150, 200, 240]); if (imp > 1.5) sfx.splash(); }
+  else if (id === 'popo') pooBlob(s, 0.05);
+}
+const ballTrail = function ballTrail(s, grounded, dt) {
+  const id = skinId();
+  if (game.state !== 'play' || s.floorY < -0.1 || (id !== 'popo' && id !== 'aerosol')) { s.trailP = null; s.spray = null; return; }
+  if (id === 'popo') {   // a smear wherever it rolls
+    if (!grounded || Math.hypot(s.vx, s.vz) < 0.25) { s.trailP = null; return; }
+    if (!s.trailP) { s.trailP = { x: s.x, z: s.z }; return; }
+    const dx = s.x - s.trailP.x, dz = s.z - s.trailP.z, d = Math.hypot(dx, dz);
+    if (d > 1.2) { s.trailP.x = s.x; s.trailP.z = s.z; return; }   // it jumped (rescued, teleported): no smear across
+    if (d < 0.3) return;
+    const cx = (s.x + s.trailP.x) / 2, cz = (s.z + s.trailP.z) / 2, w = 0.026 + Math.random() * 0.02;
+    D('trazo', cx, cz, Math.abs(dx) / 2 + w + 0.02, Math.abs(dz) / 2 + w + 0.02, { ax: s.trailP.x - cx, az: s.trailP.z - cz, bx: s.x - cx, bz: s.z - cz, w, ph: Math.random() * 9 });
+    s.trailP.x = s.x; s.trailP.z = s.z;
+  } else if (s.spray) {   // right after a kick the can keeps spraying a line on the ground below it
+    const S = s.spray; S.t -= dt;
+    if (S.t <= 0) { s.spray = null; return; }
+    if (Math.hypot(s.x - S.x, s.z - S.z) < 0.1) return;
+    S.x = s.x; S.z = s.z;
+    graffiti(s.x, s.z, 0.04 + Math.random() * 0.03 + S.t * 0.03, S.c, S.c);
+  }
+}
 const updateParts = function updateParts(dt) {
   const A = world.parts;
   for (const p of A) {
@@ -5695,7 +5807,7 @@ const drawChori = function drawChori(sx, sy, Rp, z, ang) {
   }
 }
 let stoneView = -1;   // the title screen's picker shows a skin before it's unlocked
-const SKIN_DOT = { papel: [236, 234, 226], lata: [196, 40, 48], botella: [90, 186, 112], empanada: [226, 160, 76], choripan: [196, 120, 70], clasica: [236, 236, 232], mundial: [230, 236, 236], tenis: [214, 232, 72], trapo: [200, 120, 96], alfajor: [92, 58, 38], mate: [134, 86, 48], rugby: [240, 236, 226], pelotaoro: [240, 200, 70] };
+const SKIN_DOT = { papel: [236, 234, 226], lata: [196, 40, 48], botella: [90, 186, 112], empanada: [226, 160, 76], choripan: [196, 120, 70], clasica: [236, 236, 232], mundial: [230, 236, 236], tenis: [214, 232, 72], trapo: [200, 120, 96], alfajor: [92, 58, 38], mate: [134, 86, 48], rugby: [240, 236, 226], pelotaoro: [240, 200, 70], pila: [180, 110, 50], pez: [120, 150, 176], popo: [126, 76, 38], aerosol: [236, 52, 150] };
 const DOTSH = { c: [0, 0, 0], px(nu, nv, nz) { const l = 0.55 + 0.5 * Math.max(0, -nv * 0.6 + nz * 0.6), c = this.c; return tc(c[0] * l, c[1] * l, c[2] * l); } };
 const skinId = function skinId() { const i = game.state === 'title' && stoneView >= 0 ? stoneView : game.stoneSkin; return (STONES[i] || STONES[0]).id; }
 // draws whatever you're kicking; also used when a cop or a dog has it
@@ -5714,6 +5826,10 @@ const drawSkin = function drawSkin(x, y, Rp, z, rx, rz, s, forceId) {   // force
   if (id === 'rugby') return drawRugby(x, y + Rp * 0.1, Rp, z, rz * 0.18 + (s && s.float ? s.spin : 0));
   const crazy = s && s.float ? s.spin : 0;   // floating on the brownie: it spins round like mad
   const tilt = (s ? clamp(s.vx / (Math.abs(s.vz) + 0.8), -0.6, 0.6) * 0.7 : 0.35) + crazy;
+  if (id === 'pila') return drawPila(x, y + Rp * 0.3, Rp * 0.95, z, tilt + Math.sin(rz * 0.11) * 0.2);
+  if (id === 'aerosol') return drawAerosol(x, y + Rp * 0.3, Rp * 0.95, z, tilt + Math.sin(rz * 0.11) * 0.2 + Math.PI);
+  if (id === 'pez') return drawPez(x, y + Rp * 0.2, Rp * 1.1, z, crazy + Math.sin(TIME * 15) * (s && s.y < 0.05 ? 0.28 : 0.1) + Math.sin(rz * 0.09) * 0.35);   // flapping, more when it's on the ground
+  if (id === 'popo') return drawPopo(x, y, Rp * 1.05, z, crazy + Math.sin(rz * 0.1) * 0.35);
   if (id === 'lata') return drawRoller(x, y + Rp * 0.2, Rp, z, rz, tilt, false);
   if (id === 'botella') return drawRoller(x, y + Rp * 0.3, Rp, z, rz, tilt + Math.sin(rz * 0.13) * 0.3, true);
   if (id === 'choripan') return drawChori(x, y + Rp * 0.2, Rp, z, tilt + Math.sin(rz * 0.1) * 0.25);
@@ -5774,7 +5890,7 @@ const limb = function limb(ax, ay, ar, bx, by, br, shade) {
       const ex = px - dx * t, ey = py - dy * t;
       const dist = Math.sqrt(ex * ex + ey * ey), r = ar + (br - ar) * t;
       if (dist > r) continue;
-      buf[y * W + x] = shade(t, ex / r, r - dist < 1.1, L);
+      buf[y * W + x] = MOSAIC ? mosaicCol(x, y) : shade(t, ex / r, r - dist < 1.1, L);
     }
   }
 }
@@ -5787,6 +5903,8 @@ const QS = { x: 0, y: 0, s: 0, z: 0 }, QE = { x: 0, y: 0, s: 0, z: 0 }, QW = { x
 const skinMods = function skinMods(u, v, l) {
   if (OUT.metal) { if (v > 0.1 && v < 0.38) l += 0.3; if (fr(u * 4) < 0.07) l *= 0.62; return tc(SKIN[0] * l, SKIN[1] * l, SKIN[2] * l); }
   if (OUT.zombie) { const h = h2((u * 7) | 0, ((v + 1) * 2.5) | 0); if (h > 0.84) return tc(120 * l, 26 * l, 30 * l); if (h < 0.08) return tc(70 * l, 74 * l, 60 * l); }
+  if (OUT.web && webLine(u, v)) return tc(16 * l, 14 * l, 20 * l);   // Spider-Man's gloves
+  if (OUT.glove && u > 0.8) return tc(120 * l, 132 * l, 156 * l);    // the astronaut's glove cuff
   return tc(SKIN[0] * l, SKIN[1] * l, SKIN[2] * l);
 }
 const skinShade = function skinShade(u, v, edge) {
@@ -5833,6 +5951,25 @@ const shortsShade = function shortsShade(u, v, edge, L) {
   else if (u > 0.84) l *= 0.76;
   if (OUT.rag && u > 0.62 && fr(v * 2.7 + u * 0.4) < (u - 0.62) * 1.6) return OUT.zombie ? tc(SKIN[0] * l, SKIN[1] * l, SKIN[2] * l) : LO;   // ragged, torn hem
   const lp = OUT.legPat;   // shop outfits: printed or textured legs
+  if (lp === 'rgb') {   // black, a strip of light down the outside of each leg flowing through the colours
+    const c = hueCol(u * 0.5 + LEGSEG * 0.5 - TIME * 0.6 + LEGSIDE * 0.25), on = sv > 0.32 && sv < 0.68, k = on ? 1 : 0.12;
+    return tc(r * l + c[0] * k, g * l + c[1] * k, b * l + c[2] * k);
+  }
+  if (lp === 'spider') {   // blue legs, red boots from the knee down, the web on the red
+    if (LEGSEG > 0) { if (webLine(u, v)) return tc(16 * l, 14 * l, 20 * l); [r, g, b] = OUT.c1; }
+    return tc(r * l, g * l, b * l);
+  }
+  if (lp === 'plate') {   // armour: plates, a bright streak, the round knee guard at the top of the shin
+    if (v > 0.12 && v < 0.36) l += 0.3;
+    if (fr(u * 3.5) < 0.1) l *= 0.62;
+    if (LEGSEG === 1 && u < 0.2) { l += 0.12; if (u > 0.16) l *= 0.6; }
+    return tc(r * l, g * l, b * l);
+  }
+  if (lp === 'puffy') {   // the space suit: puffy rings, a grey pad on the knee
+    if (fr(u * L / 9) < 0.14) l *= 0.82;
+    if (LEGSEG === 1 && u < 0.16) [r, g, b] = [190, 192, 202];
+    return tc(r * l, g * l, b * l);
+  }
   if (lp === 'camo') { const n = vnoise(u * L * 0.06 + LEGSIDE * 9, v * 1.4); [r, g, b] = n < 0.38 ? OUT.c2 : n > 0.62 ? OUT.c3 : OUT.c1; }
   else if (lp === 'jean') { if (Math.abs(sv - 0.62) < 0.05) [r, g, b] = [214, 150, 60]; else { const f = vnoise(u * L * 0.2, v * 3) - 0.5; r += f * 20; g += f * 22; b += f * 26; } }   // denim with orange side stitching
   else if (lp === 'scales') { if (fr(u * L * 0.08 + (v > 0 ? 0.5 : 0)) < 0.18) { r *= 0.72; g *= 0.76; b *= 0.72; } }
@@ -5869,6 +6006,48 @@ const shoePix = function shoePix(sk, u, w, aw, p, edgePx, side) {
   const wo = w * -side;
   let l = 0.9 - 0.13 * w + (aw < 0.3 && u > 0.3 && u < 0.84 ? 0.05 : 0);
   let c;
+  if (sk.bonefeet) {
+    // a skeleton's foot: the heel bone, then a long thin bone out to each toe with knobbly joints, dark between them
+    if (aw > p * 0.9) return tc(24, 22, 26);
+    if (u < 0.3) { const k = 0.8 + 0.22 * (1 - aw); return tc(236 * k, 230 * k, 212 * k); }
+    const q = fr((w + 1) * 2.6);
+    if (q < 0.3 || q > 0.78) return tc(24, 22, 26);
+    let k = 0.8 + (0.24 - Math.abs(q - 0.54)) * 0.9;
+    if (Math.abs(fr(u * 4.2) - 0.5) > 0.42) k *= 1.12;
+    return tc(236 * k, 230 * k, 212 * k);
+  }
+  if (sk.dinofeet) {
+    // a big green dino foot: scales, three fat toes with ivory claws
+    if (u > 0.7) {
+      const q = fr((w + 1) * 1.5);
+      if (q < 0.12 || q > 0.88) return tc(40 * l, 82 * l, 36 * l);
+      if (u > 0.9 - (0.5 - Math.abs(q - 0.5)) * 0.3) { const k = 0.86 + (0.5 - Math.abs(q - 0.5)) * 0.5; c = sk.stripe; return tc(c[0] * k, c[1] * k, c[2] * k); }
+    }
+    c = edgePx < 2.4 ? sk.sole : sk.base;
+    if (fr(u * 9 + (fr((w + 1) * 3) < 0.5 ? 0.5 : 0)) < 0.18) l *= 0.8;
+    return tc(c[0] * l, c[1] * l, c[2] * l);
+  }
+  if (sk.armor) {
+    // sabaton: overlapping steel plates across the foot, a pointed toe, a bright streak, rivets
+    c = edgePx < 2.2 ? sk.sole : sk.base;
+    const f = fr(u * 7);
+    if (f < 0.13 && u > 0.25 && u < 0.92) c = sk.stripe;
+    else if (Math.abs(f - 0.32) < 0.06 && Math.abs(aw - 0.62) < 0.09) c = [90, 94, 104];
+    if (aw < 0.3 && u > 0.3) l += 0.24;
+    return tc(c[0] * l, c[1] * l, c[2] * l);
+  }
+  if (sk.web) {
+    // Spider-Man's boots: red with the black web
+    c = edgePx < 2.2 ? sk.sole : sk.base;
+    if (Math.abs(fr((w + 1) * 2.2) - 0.5) > 0.43 || fr(u * 6 + w * w * 0.5) < 0.07) c = sk.stripe;
+    if (aw < 0.3 && u > 0.5 && u < 0.85) l += 0.1;
+    return tc(c[0] * l, c[1] * l, c[2] * l);
+  }
+  if (sk.rgb) {
+    // gamer sneakers: black, with a glowing sole and laces cycling through every colour
+    if (edgePx < 2.6) { const h = hueCol(u * 0.6 - TIME * 0.7 + side * 0.2); return tc(h[0], h[1], h[2]); }
+    if (u > 0.36 && u < 0.8 && aw < 0.31 && fr((u - 0.36) / 0.088) < 0.42) { const h = hueCol(u * 0.6 - TIME * 0.7 + 0.5); return tc(h[0] * 0.9, h[1] * 0.9, h[2] * 0.9); }
+  }
   if (sk.bare) {
     // barefoot: skin, a darker rim, five toes with little nails
     c = aw > p * 0.82 || u < -0.04 ? [200, 142, 106] : SKIN;
@@ -5945,7 +6124,7 @@ const drawShoe = function drawShoe(hx, hy, tx, ty, hw, side) {
       const aw = Math.abs(w);
       if (aw > p) continue;
       const edgePx = (p - aw) * hw;
-      buf[y * W + x] = edgePx < 1 ? oc : shoePix(sk, u, w, aw, p, edgePx, side);
+      buf[y * W + x] = MOSAIC ? mosaicCol(x, y) : edgePx < 1 ? oc : shoePix(sk, u, w, aw, p, edgePx, side);
     }
   }
 }
@@ -5995,7 +6174,7 @@ const drawLeg = function drawLeg(f) {
     }
   } else if (okK && okA) {
     if (OUT.bones) limb(QK.x, QK.y, 0.024 * QK.s, QA.x, QA.y, 0.02 * QA.s, boneShade);            // shin bone
-    else if (OUT.long) limb(QK.x, QK.y, 0.058 * QK.s, QA.x, QA.y, 0.056 * QA.s, shortsShade);       // baggy pants down to the shoe
+    else if (OUT.long) { LEGSEG = 1; limb(QK.x, QK.y, 0.058 * QK.s, QA.x, QA.y, 0.056 * QA.s, shortsShade); }   // baggy pants down to the shoe
     else {
       limb(QK.x, QK.y, 0.04 * QK.s, QA.x, QA.y, 0.034 * QA.s, shinSkin);
       if (KSH.boot) { GREYOUT = LOCKSHOE; limb(lerp(QK.x, QA.x, 0.4), lerp(QK.y, QA.y, 0.4), 0.05 * QA.s, QA.x, QA.y, 0.047 * QA.s, bootShade); GREYOUT = LOCKFIT; }
@@ -6007,7 +6186,7 @@ const drawLeg = function drawLeg(f) {
   GREYOUT = LOCKFIT;
   if (okK && okA && !peg) {
     if (OUT.bones) { if (!KSH.bare && !KSH.boot) limb(lerp(QK.x, QA.x, 0.84), lerp(QK.y, QA.y, 0.84), 0.03 * QA.s, QA.x, QA.y, 0.032 * QA.s, cuffShade); }   // a bony ankle in the shoe
-    else if (OUT.long) limb(lerp(QK.x, QA.x, 0.78), lerp(QK.y, QA.y, 0.78), 0.06 * QA.s, QA.x, QA.y, 0.062 * QA.s, shortsShade);   // hem piled on the sneaker
+    else if (OUT.long) { LEGSEG = 2; limb(lerp(QK.x, QA.x, 0.78), lerp(QK.y, QA.y, 0.78), 0.06 * QA.s, QA.x, QA.y, 0.062 * QA.s, shortsShade); }   // hem piled on the sneaker
     else if (!KSH.bare && !KSH.boot && !OUT.naked && !OUT.noSock) limb(lerp(QK.x, QA.x, 0.8), lerp(QK.y, QA.y, 0.8), 0.039 * QA.s, QA.x, QA.y, 0.039 * QA.s, cuffShade);
   }
   if (okK && okH) {
@@ -6016,8 +6195,8 @@ const drawLeg = function drawLeg(f) {
       limb(QH.x, QH.y, 0.026 * QH.s, QK.x, QK.y, 0.024 * QK.s, boneShade);
       ellipse(QK.x, QK.y, Math.max(1, 0.034 * QK.s), Math.max(1, 0.03 * QK.s), tc(226, 220, 200), -1, tc(110, 104, 92));
       const mx = lerp(QH.x, QK.x, 0.45), my = lerp(QH.y, QK.y, 0.45);
-      limb(QH.x, QH.y, 0.075 * QH.s, mx, my, 0.07 * QK.s, shortsShade);
-    } else if (OUT.long) limb(QH.x, QH.y, 0.066 * QH.s, QK.x, QK.y, 0.06 * QK.s, shortsShade);
+      if (!OUT.skel) limb(QH.x, QH.y, 0.075 * QH.s, mx, my, 0.07 * QK.s, shortsShade);   // (the skeleton has no robe)
+    } else if (OUT.long) { LEGSEG = 0; limb(QH.x, QH.y, 0.066 * QH.s, QK.x, QK.y, 0.06 * QK.s, shortsShade); }
     else {
       limb(QH.x, QH.y, 0.05 * QH.s, QK.x, QK.y, 0.043 * QK.s, skinShade);
       if (!OUT.naked) { const mx = lerp(QH.x, QK.x, 0.58), my = lerp(QH.y, QK.y, 0.58); limb(QH.x, QH.y, 0.064 * QH.s, mx, my, lerp(0.064 * QH.s, 0.06 * QK.s, 0.58), shortsShade); }
@@ -6039,9 +6218,59 @@ const armIK = function armIK(side) {
   ELB[0] = SHO[0] + ux * a + bx * h; ELB[1] = SHO[1] + uy * a + by * h; ELB[2] = SHO[2] + uz * a + bz * h;
 }
 const RAINBOW = [[236, 70, 80], [250, 150, 60], [250, 220, 70], [90, 200, 110], [70, 150, 240], [150, 90, 220]];
+// the RGB skin: a fully saturated colour going round the wheel (h in turns)
+const HUE = [0, 0, 0];
+const hueCol = function hueCol(h) {
+  h = fr(h) * 6; const i = h | 0, f = (h - i) * 255, q = 255 - f;
+  if (i === 0) { HUE[0] = 255; HUE[1] = f; HUE[2] = 0; } else if (i === 1) { HUE[0] = q; HUE[1] = 255; HUE[2] = 0; }
+  else if (i === 2) { HUE[0] = 0; HUE[1] = 255; HUE[2] = f; } else if (i === 3) { HUE[0] = 0; HUE[1] = q; HUE[2] = 255; }
+  else if (i === 4) { HUE[0] = f; HUE[1] = 0; HUE[2] = 255; } else { HUE[0] = 255; HUE[1] = 0; HUE[2] = q; }
+  return HUE;
+}
+// the censored skin: the whole kid in big skin-coloured blocks fixed to the screen, like a blurred-out face on the news
+let MOSAIC = false;
+const mosaicCol = function mosaicCol(x, y) {
+  const bx = Math.floor(x / 6), by = Math.floor(y / 6), h = h2(bx * 7 + 3, by * 13 + 5), k = 0.78 + h * 0.4, pink = h2(bx + 91, by + 37) > 0.8;
+  return tc(SKIN[0] * k + (pink ? 16 : 0), SKIN[1] * k * (pink ? 0.86 : 1), SKIN[2] * k * (pink ? 0.92 : 1));
+}
+// which piece of leg is being drawn (some costumes change from the knee down): 0 thigh, 1 shin, 2 the hem over the shoe
+let LEGSEG = 0;
+// spider web on a limb: lines along it and sagging threads across
+const webLine = (u, v) => Math.abs(fr((v + 1) * 2.5) - 0.5) > 0.42 || fr(u * 5 + v * v * 0.6) < 0.07;
+const segD = function segD(px, py, ax, ay, bx, by) { const dx = bx - ax, dy = by - ay; let t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy); t = t < 0 ? 0 : t > 1 ? 1 : t; return Math.hypot(px - ax - dx * t, py - ay - dy * t); }
 const sleeveShade = function sleeveShade(u, v, edge) {
   let s = OUT.sleeve;
   const sp = OUT.slvPat;   // shop outfits print their pattern on the sleeves too
+  if (sp === 'rgb') {   // black with a strip of light down the middle, flowing through the colours
+    if (edge) return tc(8, 8, 10);
+    const c = hueCol(u * 0.7 - TIME * 0.6), on = Math.abs(v) < 0.3, k = on ? 1 : 0.14, l = 0.8 + 0.2 * v;
+    return tc(24 * l + c[0] * k, 24 * l + c[1] * k, 30 * l + c[2] * k);
+  }
+  if (sp === 'web') {   // Spider-Man: red with the black web, blue underneath
+    if (edge) return tc(40, 6, 10);
+    const l = 0.8 + 0.22 * v - 0.12 * v * v;
+    if (webLine(u, v)) return tc(16 * l, 14 * l, 20 * l);
+    const c = v < -0.55 ? OUT.c2 : s;
+    return tc(c[0] * l, c[1] * l, c[2] * l);
+  }
+  if (sp === 'plate') {   // armour: overlapping steel plates, a bright streak, rivets
+    if (edge) return tc(60, 64, 72);
+    let l = 0.78 + 0.24 * v - 0.12 * v * v;
+    if (v > 0.12 && v < 0.36) l += 0.32;
+    const f = fr(u * 4);
+    if (f < 0.1) l *= 0.6; else if (f < 0.16 && Math.abs(v) < 0.12) l *= 0.55;
+    return tc(s[0] * l, s[1] * l, s[2] * l);
+  }
+  if (sp === 'puffy') {   // the space suit: puffy rings, and the Argentine flag on the shoulder
+    if (edge) return tc(120, 122, 132);
+    let l = 0.82 + 0.2 * v - 0.12 * v * v;
+    if (fr(u * 4.5) < 0.13) l *= 0.8;
+    if (u > 0.1 && u < 0.3 && v > 0.22 && v < 0.85) {
+      const c = u < 0.165 || u > 0.235 ? [116, 172, 224] : Math.abs(u - 0.2) < 0.02 && Math.abs(v - 0.54) < 0.09 ? [240, 190, 60] : [246, 246, 244];
+      return tc(c[0] * l, c[1] * l, c[2] * l);
+    }
+    return tc(s[0] * l, s[1] * l, s[2] * l);
+  }
   if (sp === 'camo') { const n = vnoise(u * 3 + LEGSIDE * 7, v * 1.3); s = n < 0.38 ? OUT.c2 : n > 0.62 ? OUT.c3 : OUT.c1; }
   else if (sp === 'plaid') s = (fr(u * 3) < 0.42) !== (fr((v + 1) * 1.5) < 0.42) ? [(OUT.c1[0] + OUT.c2[0]) / 2, (OUT.c1[1] + OUT.c2[1]) / 2, (OUT.c1[2] + OUT.c2[2]) / 2] : (fr(u * 3) < 0.42 ? OUT.c2 : OUT.c1);
   else if (sp === 'scales') { if (fr(u * 7 + (v > 0 ? 0.5 : 0)) < 0.16) s = [s[0] * 0.72, s[1] * 0.76, s[2] * 0.72]; }
@@ -6053,7 +6282,8 @@ const sleeveShade = function sleeveShade(u, v, edge) {
   return tc(s[0] * l, s[1] * l, s[2] * l);
 }
 // shirt pattern at a point of the chest (sx: across, yy: down from the collar)
-const FLOWER_MID = [250, 214, 70], ZIPC = [96, 96, 104];
+const FLOWER_MID = [250, 214, 70], ZIPC = [96, 96, 104], WEBK = [16, 14, 20];
+const ASTRO_LED = [[240, 60, 60], [80, 230, 110], [250, 210, 60], [80, 170, 250]], RIBC = [0, 0, 0];
 const shirtCol = function shirtCol(sx, yy) {
   const o = OUT;
   switch (o.pat) {
@@ -6102,6 +6332,55 @@ const shirtCol = function shirtCol(sx, yy) {
       const dx = sx - (cx + 0.3 + h * 0.4) * 13, dy = yy - (cy + 0.5) * 12, d2 = dx * dx + dy * dy;
       return d2 < 2.2 ? FLOWER_MID : d2 < 12 && h > 0.25 ? o.c2 : o.c1;
     }
+    case 'knight': {   // polished breastplate: a ridge down the middle, the lower plates overlapping, rivets, a gold trim
+      const a = Math.abs(sx);
+      if (a < 1.6) return [228, 232, 240];
+      if (yy > 20 && fr((yy - 20) / 9) < 0.15) return [108, 114, 124];
+      if (Math.abs(a - 52) < 1.7 && fr(yy / 8) < 0.24) return [92, 98, 108];
+      if (a > 84 && a < 89) return o.c2;
+      return a < 26 ? [204, 210, 220] : o.c1;
+    }
+    case 'astro': {   // white suit: the control box on the chest with blinking lights, the flag patch, soft folds
+      const a = Math.abs(sx);
+      if (a < 20 && yy > 2 && yy < 17) {
+        if (a > 18.5 || yy < 3.5 || yy > 15.5) return [40, 42, 50];
+        const bx = Math.floor((sx + 20) / 8), by = Math.floor((yy - 3) / 6), cu = fr((sx + 20) / 8), cv = fr((yy - 3) / 6);
+        if (cu > 0.22 && cu < 0.78 && cv > 0.22 && cv < 0.78) {
+          const L = ASTRO_LED[(bx + by * 2) & 3], on = h2(bx + 7, by + Math.floor(TIME * 2.5) * 3) > 0.4;
+          return on ? L : [L[0] * 0.3, L[1] * 0.3, L[2] * 0.3];
+        }
+        return o.c2;
+      }
+      if (sx > 34 && sx < 54 && yy > 3 && yy < 16) return yy < 7.3 || yy > 11.7 ? [116, 172, 224] : Math.abs(sx - 44) < 1.6 && Math.abs(yy - 9.5) < 1.6 ? [240, 190, 60] : [246, 246, 244];
+      return vnoise(sx * 0.05 + 4, yy * 0.12) > 0.64 ? [212, 212, 218] : o.c1;
+    }
+    case 'rgb': {   // black, with waves of light flowing through every colour
+      if (fr((yy + Math.abs(sx) * 0.25) / 16 - TIME * 0.7) < 0.24) return hueCol(sx * 0.004 + yy * 0.012 - TIME * 0.35);
+      return Math.abs(sx) < 1.3 ? [64, 64, 74] : o.c1;
+    }
+    case 'ribs': {   // the ribcage: the breastbone down the middle, rounded ribs curving down and round either side, dark gaps
+      const a = Math.abs(sx);
+      if (a > 76) return o.c2;
+      if (a < 5) return fr(yy / 9.5) < 0.16 ? [140, 134, 120] : [214, 208, 190];
+      if (a < 7) return o.c2;
+      const r = fr((yy + 2 - a * 0.26 - a * a * 0.0012) / 9.5);
+      if (r > 0.6) return o.c2;
+      const k = 1.04 - Math.abs(r - 0.3) * 1.5;
+      RIBC[0] = 236 * k; RIBC[1] = 230 * k; RIBC[2] = 212 * k; return RIBC;
+    }
+    case 'spider': {   // red, the web spreading out from the black spider on the chest, blue down the sides
+      const a = Math.abs(sx);
+      if (a > 78) return o.c2;
+      const sy = yy - 8;
+      if (a < 14 && Math.abs(sy) < 10) {
+        if ((sx / 3) ** 2 + (sy / 5.4) ** 2 < 1) return WEBK;
+        for (let k = 0; k < 4; k++) if (segD(a, sy, 1.5, -3 + k * 2, 12, -8.5 + k * 5.4) < 0.85) return WEBK;
+      }
+      const ang = Math.atan2(sy, sx) / 6.283 * 16, rr = Math.hypot(sx, sy), fa = fr(ang);
+      if (Math.min(fa, 1 - fa) * 0.393 * rr < 0.7) return WEBK;   // threads out from the middle (0.7 px wide at any distance)
+      if (fr((rr - 2.4 * Math.sin(fa * Math.PI)) / 9) < 0.1) return WEBK;          // rings, sagging between threads
+      return o.c1;
+    }
     default: return o.c1;
   }
 }
@@ -6123,7 +6402,8 @@ const drawArms = function drawArms() {
     armIK(s);
     const okS = wp(SHO, QS), okE = wp(ELB, QE), okW = wp(HND, QW);
     // stick arms ("palito"): thin sleeve, thin forearm, round fist
-    if (okS && okE) limb(QS.x, QS.y, (OUT.pat === 'robe' ? 0.042 : 0.03) * QS.s, QE.x, QE.y, (OUT.pat === 'robe' ? 0.04 : 0.024) * QE.s, (OUT.naked || OUT.skinTop) ? skinShade : sleeveShade);
+    if (OUT.skel) { if (okS && okE) { limb(QS.x, QS.y, 0.02 * QS.s, QE.x, QE.y, 0.018 * QE.s, boneShade); ellipse(QE.x, QE.y, Math.max(1, 0.026 * QE.s), Math.max(1, 0.024 * QE.s), tc(226, 220, 200), -1, tc(110, 104, 92)); } }   // the skeleton: bare bones, a knobbly elbow
+    else if (okS && okE) limb(QS.x, QS.y, (OUT.pat === 'robe' ? 0.042 : 0.03) * QS.s, QE.x, QE.y, (OUT.pat === 'robe' ? 0.04 : 0.024) * QE.s, (OUT.naked || OUT.skinTop) ? skinShade : sleeveShade);
     if (okE && okW) limb(QE.x, QE.y, 0.022 * QE.s, QW.x, QW.y, 0.019 * QW.s, OUT.bones ? boneShade : shinSkin);
     if (okW) {
       const R = 0.036 * QW.s * LIMB_SCALE;
@@ -6142,6 +6422,7 @@ const drawTorso = function drawTorso() {
       const edgeY = top + dxn * dxn * 46;
       const d = y + 0.5 - edgeY;
       if (d < 0) continue;
+      if (MOSAIC) { buf[y * W + x] = mosaicCol(x, y); continue; }
       const sx = (x + 0.5 - cx) / (1 + (y - top) * 0.014);
       const c = shirtCol(sx, d);
       let k = 1.04 - dxn * dxn * 0.38 + (Math.abs(dxn) < 0.35 && d > 4 && d < 14 ? 0.05 : 0);
@@ -6174,19 +6455,22 @@ const drawPlayer = function drawPlayer() {
   // on the title screen, whatever isn't unlocked yet is shown in grey
   LOCKFIT = browsing && !STORE.open && !isUnlocked(OUT); LOCKSHOE = browsing && !STORE.open && !isUnlocked(KSH);   // (in the shop you see it in colour)
   GREYOUT = LOCKFIT;
+  // the black-and-white kid flickers like an old film; the censored one is all mosaic (not while shown locked in grey)
+  const bw = OUT.bw && !LOCKFIT ? 0.93 + Math.random() * 0.07 : 0, mos = !!OUT.censor && !LOCKFIT;
+  BWK = bw; MOSAIC = mos;
   prepTint(P.x, P.z + 0.3, 0.9);
   LO = tc(16, 22, 46); SKO = tc(sk[0] * 0.5, sk[1] * 0.37, sk[2] * 0.35);
   const f0 = P.feet[0], f1 = P.feet[1];
   const order = f0.rz > f1.rz ? [f0, f1] : [f1, f0];
   for (const f of order) drawLeg(f);
-  GREYOUT = false;
+  GREYOUT = false; BWK = 0; MOSAIC = false;
   if (stoneOverLegs()) drawStone();
-  GREYOUT = LOCKFIT;
+  GREYOUT = LOCKFIT; BWK = bw; MOSAIC = mos;
   prepTint(P.x, P.z + 0.3, 0.9);
   drawArms();
-  if (OUT.naked) drawFigLeaf();
+  if (OUT.naked && !OUT.censor) drawFigLeaf();
   drawTorso();
-  GREYOUT = false;
+  GREYOUT = false; BWK = 0; MOSAIC = false;
 }
 let LOCKFIT = false, LOCKSHOE = false;
 // Adán's fig leaf: pressed against him where the thighs meet, its stem end tucked in under the belly
@@ -6260,6 +6544,7 @@ const render = function render() {
   drawCash(true);    // pesos flying into your pocket, over everything
   drawDizzy();
   drawRings();
+  drawZaps();
   drawSpeedLines();
   drawFlash();
   puchoWarp();
@@ -6361,6 +6646,66 @@ const drawMate = function drawMate(sx, sy, Rp, z, ang) {
     if (v < -0.44) return PX(204, 208, 214, 0.75 + (u < -0.2 ? 0.35 : 0));   // the silver rim
     const h = Math.sqrt(Math.max(0, 1 - bq));
     return Math.abs(u + 0.52 - v * 0.1) < 0.02 ? PX(60, 36, 20, 0.9) : PX(124, 76, 42, 0.62 + 0.45 * h - u * 0.15);   // leather with a stitched seam
+  });
+}
+// AA battery lying on its side: black body, copper end with the + and the little nub, silver bottom
+const drawPila = function drawPila(sx, sy, Rp, z, ang) {
+  spriteRot(sx, sy, Rp, z, ang, 1.6, (u, v) => {
+    if (u > 1.2 && u < 1.36 && Math.abs(v) < 0.16) return PX(214, 216, 222, 0.9 - v * 0.6);   // the + terminal
+    if (Math.abs(u) > 1.2 || Math.abs(v) > 0.46) return null;
+    const h = Math.sqrt(Math.max(0, 1 - (v / 0.46) ** 2)), l = 0.5 + 0.55 * h - v * 0.35;
+    if (u < -1.12) return PX(196, 198, 204, l);   // the flat silver bottom
+    if (u > 0.36) {
+      if ((Math.abs(u - 0.8) < 0.15 && Math.abs(v + 0.02) < 0.035) || (Math.abs(v + 0.02) < 0.14 && Math.abs(u - 0.8) < 0.04)) return PX(60, 30, 14, l);
+      return PX(214, 124, 50, l + 0.1);   // copper
+    }
+    if (u > 0.3) return PX(236, 200, 90, l);   // a gold ring between the two
+    return Math.abs(u + 0.4) < 0.3 && Math.abs(v) < 0.1 ? PX(236, 200, 90, l * 0.9) : PX(30, 30, 34, l + 0.15);   // black, with a gold label in the middle
+  });
+}
+// a fish (side on): blue back, silver belly, an eye, fins and tail; it flaps
+const drawPez = function drawPez(sx, sy, Rp, z, ang) {
+  spriteRot(sx, sy, Rp, z, ang, 1.7, (u, v) => {
+    const q = (u / 1.02) ** 2 + (v / 0.5) ** 2;
+    if (q >= 1) {
+      if (u < -0.82 && u > -1.5 && Math.abs(v) < (-0.82 - u) * 0.95 + 0.05) return PX(90, 128, 160, 0.82 + Math.abs(v) * 0.3);   // tail
+      if (v < -0.3 && v > -0.72 && u > -0.42 && u < 0.32 && v > -0.3 - (0.32 - u) * 0.62) return PX(96, 134, 168, 0.8);         // fin on the back
+      return null;
+    }
+    if ((u - 0.6) ** 2 + (v + 0.1) ** 2 < 0.012) return (u - 0.62) ** 2 + (v + 0.13) ** 2 < 0.002 ? PX(250, 250, 250, 1) : PX(14, 14, 18, 1);   // eye
+    if (u > 0.9 && Math.abs(v - 0.08) < 0.03) return PX(60, 40, 50, 0.8);   // mouth
+    if (Math.abs(u - 0.38 - Math.abs(v) * 0.3) < 0.03 && Math.abs(v) < 0.4) return PX(70, 96, 120, 0.8);   // gill
+    const h = Math.sqrt(1 - q), l = 0.55 + 0.5 * h, back = v < 0.05 - u * 0.05;
+    const sc = fr(u * 7 + (fr(v * 5) < 0.5 ? 0.5 : 0)) < 0.12 ? 0.86 : 1;
+    return back ? PX(70 * sc, 112 * sc, 148 * sc, l) : PX(214 * sc, 222 * sc, 228 * sc, l);
+  });
+}
+// a poo, emoji style: three swirls, a curl on top, eyes and a smile
+const drawPopo = function drawPopo(sx, sy, Rp, z, ang) {
+  spriteRot(sx, sy, Rp, z, ang, 1.5, (u, v) => {
+    const t1 = (u / 1.0) ** 2 + ((v - 0.4) / 0.38) ** 2, t2 = (u / 0.74) ** 2 + ((v + 0.08) / 0.3) ** 2, t3 = ((u - 0.04) / 0.46) ** 2 + ((v + 0.46) / 0.24) ** 2, t4 = ((u - 0.14) / 0.16) ** 2 + ((v + 0.74) / 0.14) ** 2;
+    const m = Math.min(t1, t2, t3, t4); if (m >= 1) return null;
+    const front = t2 < 1;
+    if (front) {   // eyes, looking a little towards each other
+      const ex = u < 0 ? -0.26 : 0.26, dx = u - ex, dy = v + 0.1;
+      if (dx * dx + dy * dy < 0.02) return (dx + ex * 0.15) ** 2 + (dy - 0.02) ** 2 < 0.005 ? PX(20, 14, 10, 1) : PX(250, 250, 248, 1);
+    }
+    if (front && v > 0.04 && v < 0.12 && Math.abs(u) < 0.3 && Math.abs(v - 0.04 - u * u * 0.6) < 0.035) return PX(60, 26, 14, 0.9);   // smile
+    const l = 0.6 + 0.5 * Math.sqrt(1 - m) - v * 0.12;
+    return PX(126, 76, 38, l + (m < 0.25 ? 0.12 : 0));
+  });
+}
+// spray can lying down: pink can with a yellow band and drips, cyan cap, white nozzle, silver bottom
+const drawAerosol = function drawAerosol(sx, sy, Rp, z, ang) {
+  spriteRot(sx, sy, Rp, z, ang, 1.65, (u, v) => {
+    if (u > 1.32 && u < 1.46 && Math.abs(v) < 0.08) return PX(250, 250, 250, 0.9);   // nozzle
+    if (u > 1.0 && u < 1.34 && Math.abs(v) < 0.32) return PX(40, 200, 230, 0.75 + Math.sqrt(Math.max(0, 1 - (v / 0.32) ** 2)) * 0.4);   // cap
+    if (Math.abs(u) > 1.0 || Math.abs(v) > 0.44) return null;
+    const h = Math.sqrt(Math.max(0, 1 - (v / 0.44) ** 2)), l = 0.52 + 0.55 * h - v * 0.3;
+    if (u < -0.92 || (u > 0.9)) return PX(200, 202, 208, l);   // the rims
+    if (Math.abs(u - 0.1) < 0.18) return PX(250, 214, 50, l);   // yellow band
+    if (u < -0.08 && u > -0.75 && fr(v * 4 + 0.3) < 0.18 && h2(Math.floor(v * 4 + 3), 7) * 0.5 + 0.2 > (-0.08 - u)) return PX(250, 214, 50, l);   // drips off the band
+    return PX(236, 52, 150, l);
   });
 }
 // rugby ball: an oval in white with sky-blue bands near the tips, the seam and the lace
@@ -6792,12 +7137,17 @@ const canContinue = function canContinue() { return !!game.run && (game.run.cont
 // ---------- the shop: you try each thing on (the title scene keeps playing behind it) ----------
 const STORE = { open: false, cat: 'stone', i: 0 };
 const STORE_CATS = { stone: () => STONES, fit: () => OUTFITS, shoe: () => SHOES };
-const storeItems = function storeItems(cat) { const L = STORE_CATS[cat](); const out = []; L.forEach((it, idx) => { if (it.price) out.push({ it, idx }); }); return out; }
+const storeItems = function storeItems(cat) { const L = STORE_CATS[cat](); const out = []; L.forEach((it, idx) => { if (it.price && !it.old) out.push({ it, idx }); }); return out; }   // retired things aren't sold any more
 const equipped = function equipped(cat, idx) { return cat === 'stone' ? game.stoneSkin === idx : cat === 'fit' ? game.outfit === idx : game.shoe === idx; }
+// a costume's own footwear (dino feet, armour boots...), or -1
+const setShoe = (o) => o && o.shoe ? idxOf(SHOES, o.shoe, -1) : -1;
 const equip = function equip(cat, idx) {
   const L = STORE_CATS[cat](), id = L[idx].id;
   if (cat === 'stone') { game.stoneSkin = idx; store.set('stoneId', id); }
-  else if (cat === 'fit') { game.outfit = idx; store.set('outfitId', id); }
+  else if (cat === 'fit') {
+    game.outfit = idx; store.set('outfitId', id);
+    const si = setShoe(L[idx]); if (si >= 0) { game.shoe = si; store.set('shoeId', SHOES[si].id); }   // the costume comes with its shoes on
+  }
   else { game.shoe = idx; store.set('shoeId', id); }
 }
 const openStore = function openStore() {
@@ -6816,7 +7166,9 @@ const storeStep = function storeStep(d) { const n = storeItems(STORE.cat).length
 const storeShow = function storeShow() {
   const L = storeItems(STORE.cat), e = L[STORE.i], it = e.it, own = isUnlocked(it), on = own && equipped(STORE.cat, e.idx);
   stoneView = game.stoneSkin; shoeView = game.shoe; outfitView = game.outfit;
-  if (STORE.cat === 'stone') stoneView = e.idx; else if (STORE.cat === 'fit') outfitView = e.idx; else shoeView = e.idx;
+  if (STORE.cat === 'stone') stoneView = e.idx;
+  else if (STORE.cat === 'fit') { outfitView = e.idx; const si = setShoe(it); if (si >= 0) shoeView = si; }   // trying on a costume: with its own shoes
+  else shoeView = e.idx;
   $('store-name').textContent = it.name;
   $('store-count').textContent = (STORE.i + 1) + ' de ' + L.length + (own ? ' · ya es tuyo' : '');
   $('store-plata').textContent = fmtPesos(PLATA);
@@ -6954,6 +7306,10 @@ const sfx = {
     if (k === 'alfajor') { osc('sine', 130, 55, 0.08, 0.3 * v); noiseB(0.1, 0.14, 'bandpass', 2600, 0, 0.9); return; }   // crumbly
     if (k === 'mate') { osc('triangle', 330, 240, 0.09, 0.3 * v + 0.08); osc('sine', 660, 500, 0.06, 0.06); noiseB(0.03, 0.08, 'bandpass', 1500, 0, 2); return; }   // a hollow gourd tok
     if (k === 'rugby' || k === 'pelotaoro') { osc('sine', 190, 64, 0.13, 0.45 * v + 0.1); noiseB(0.04, 0.16, 'bandpass', 1600, 0, 1.2); if (k === 'pelotaoro') osc('triangle', 2350, 2300, 0.25, 0.04); return; }   // a proper ball (the gold one rings)
+    if (k === 'pila') { osc('square', 1500, 900, 0.05, 0.05 * v + 0.03); osc('triangle', 2700, 2500, 0.08, 0.04); return; }   // a little metal tink (the zap comes with the sparks)
+    if (k === 'pez') { osc('sine', 180, 80, 0.08, 0.35 * v + 0.05); noiseB(0.08, 0.16, 'lowpass', 1800, 0, 0.8); return; }   // a wet slap
+    if (k === 'popo') { osc('sine', 100, 40, 0.14, 0.4 * v + 0.05); noiseB(0.12, 0.15, 'lowpass', 700, 0, 0.8); return; }   // squelch
+    if (k === 'aerosol') { osc('triangle', 900, 700, 0.06, 0.08); osc('triangle', 1900, 1700, 0.12, 0.05); noiseB(0.03, 0.08, 'bandpass', 2600, 0, 2); return; }   // a hollow can clank (then the spray)
     if (k === 'choripan') { osc('sine', 110, 46, 0.11, 0.38 * v); noiseB(0.08, 0.15, 'lowpass', 1000, 0, 0.8); noiseB(0.22, 0.05, 'highpass', 5200, 0, 0.5); return; }   // bread thud and a bit of sizzle
     osc('sine', 170, 46, 0.15, 0.5 * v); noiseB(0.03, 0.16, 'highpass', 2600, 0, 0.8); osc('square', 1300 + Math.random() * 400, 800, 0.03, 0.04);
   },
@@ -6963,6 +7319,8 @@ const sfx = {
   tonk(v) { if (!this.ok()) return; osc('triangle', 420, 280, 0.2, 0.14); noiseB(0.04, 0.06, 'lowpass', 900, 0, 1); },
   puf() { if (!this.ok()) return; noiseB(0.14, 0.15, 'lowpass', 700, 200, 0.8); },
   boing() { if (!this.ok()) return; osc('sine', 260, 620, 0.22, 0.15); },
+  zap(v) { if (!this.ok()) return; const k = v || 1, t = this.now(); noiseB(0.14, 0.13 * k, 'bandpass', 3800, 1400, 3, t); osc('sawtooth', 110, 90, 0.12, 0.05 * k, t); osc('square', 2600, 500, 0.07, 0.035 * k, t); },   // electric bzzt
+  spray() { if (!this.ok()) return; const t = this.now(); noiseB(0.5, 0.12, 'highpass', 5200, 0, 0.6, t); noiseB(0.08, 0.05, 'bandpass', 2400, 0, 1, t); },   // psssh
   splash() { if (!this.ok()) return; const t = this.now(); noiseB(0.36, 0.2, 'lowpass', 2400, 400, 0.7); osc('sine', 500, 900, 0.08, 0.05, t); osc('sine', 700, 1300, 0.07, 0.04, t + 0.07); },
   whiff() { if (!this.ok()) return; noiseB(0.2, 0.12, 'bandpass', 500, 2400, 1.5); },
   perfect(n) { if (!this.ok()) return; const t = this.now(), b = 523.25 * Math.pow(2, Math.min(n, 14) / 12); [0, 4, 7, 12].forEach((s, i) => osc('square', b * Math.pow(2, s / 12), 0, 0.09, 0.045, t + i * 0.045)); },
@@ -7374,7 +7732,8 @@ const tryStart = function tryStart() {
   for (const el of [$('btn-play'), $(which + '-name').closest('.shoes')]) { el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope'); }
 }
 // the next item in a picker; shop things you haven't bought don't show here (they're in the shop)
-const pickNext = function pickNext(L, i, d) { for (let n = 0; n < L.length; n++) { i = (i + d + L.length) % L.length; if (!(L[i].price && !isUnlocked(L[i]))) return i; } return i; }
+// (a costume's own shoes only show up once you have the costume)
+const pickNext = function pickNext(L, i, d) { for (let n = 0; n < L.length; n++) { i = (i + d + L.length) % L.length; if (!((L[i].price || L[i].set) && !isUnlocked(L[i]))) return i; } return i; }
 const stoneStep = function stoneStep(d) {
   stoneView = pickNext(STONES, stoneView, d);
   if (isUnlocked(STONES[stoneView])) { game.stoneSkin = stoneView; store.set('stoneId', STONES[stoneView].id); }
@@ -7387,7 +7746,10 @@ const shoeStep = function shoeStep(d) {
 }
 const fitStep = function fitStep(d) {
   outfitView = pickNext(OUTFITS, outfitView, d);
-  if (isUnlocked(OUTFITS[outfitView])) { game.outfit = outfitView; store.set('outfitId', OUTFITS[game.outfit].id); }
+  if (isUnlocked(OUTFITS[outfitView])) {
+    game.outfit = outfitView; store.set('outfitId', OUTFITS[game.outfit].id);
+    const si = setShoe(OUTFITS[outfitView]); if (si >= 0) { game.shoe = shoeView = si; store.set('shoeId', SHOES[si].id); }   // a costume puts its own shoes on
+  }
   sfx.ui(); shoeUI();
 }
 // "&musica=no" in the link: sound effects and voices, but no tango in the background (and it stays that way)
