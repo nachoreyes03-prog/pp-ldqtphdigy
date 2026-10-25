@@ -368,24 +368,24 @@ body {
 .pour-btn.cont.counting .cd { animation: contCd 7s linear forwards; }
 @keyframes contCd { to { transform: scaleX(0); } }
 
-/* ---------- bigger buttons and text all over (they were small on a phone) ---------- */
-.pour-btn { height: 48px; padding: 0 20px; font-size: 17px; }
-.pour-btn.icon { width: 48px; padding: 0; }
-.pour-btn svg { width: 20px; height: 20px; }
-.pour-btn.main { height: 58px; padding: 0 36px; font-size: 20px; }
-.pour-btn.play { font-size: 22px; }
-.pour-btn.play svg { width: 17px; height: 17px; }
-.title .shop { height: 52px; padding: 0 26px; font-size: 18px; margin-top: 12px; }
-.title .shop svg { width: 20px; height: 20px; }
-.title .shop .arr { width: 15px; height: 15px; }
-.title .shoe-txt { min-width: 150px; }
-.title .shoe-txt b { font-size: 17px; }
-.title .shoe-txt small { font-size: 13px; }
-.rec { font-size: 16px; padding: 9px 15px; }
+/* ---------- buttons a bit bigger than the originals (between the first size and the big one, which was too much) ---------- */
+.pour-btn { height: 44px; padding: 0 18px; font-size: 15px; }
+.pour-btn.icon { width: 44px; padding: 0; }
+.pour-btn svg { width: 18px; height: 18px; }
+.pour-btn.main { height: 52px; padding: 0 32px; font-size: 18px; }
+.pour-btn.play { font-size: 19px; }
+.pour-btn.play svg { width: 15px; height: 15px; }
+.title .shop { height: 46px; padding: 0 22px; font-size: 16px; margin-top: 10px; }
+.title .shop svg { width: 18px; height: 18px; }
+.title .shop .arr { width: 13px; height: 13px; }
+.title .shoe-txt { min-width: 140px; }
+.title .shoe-txt b { font-size: 16px; }
+.title .shoe-txt small { font-size: 12px; }
+.rec { font-size: 15px; padding: 8px 13px; }
 .rec .bill { width: 24px; height: 13px; }
 .hud-plata { top: 72px; font-size: 21px; padding: 7px 14px 7px 11px; gap: 9px; }
 .hud-plata .bill { width: 30px; height: 17px; }
-.pour-btn.cont { font-size: 18px; }
+.pour-btn.cont { font-size: 17px; }
 .plata-run { font-size: 17px; }
 
 /* ---------- the shop: you try things on, the kid shows them behind the buttons ---------- */
@@ -395,14 +395,14 @@ body {
 .store-sub { color: var(--chalk); font-size: 15px; max-width: 300px; text-wrap: balance; opacity: .9; }
 .store-bottom { position: absolute; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translateX(-50%); display: grid; gap: 10px; justify-items: center; width: min(94%, 400px); }
 .store-tabs { display: flex; gap: 4px; background: rgba(21, 18, 28, .72); padding: 5px; border-radius: 999px; }
-.store-tabs button { border: 0; cursor: pointer; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 600; font-size: 16px; min-height: 42px; padding: 0 17px; border-radius: 999px; }
+.store-tabs button { border: 0; cursor: pointer; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 600; font-size: 15px; min-height: 38px; padding: 0 15px; border-radius: 999px; }
 .store-tabs button.on { background: var(--sol); color: var(--ink); }
 .store-tabs button:focus-visible { outline: 2px solid var(--sol); outline-offset: 2px; }
 .store-row { background: rgba(21, 18, 28, .72); border-radius: 999px; padding: 5px; }
-.store-row .shoe-txt { min-width: 180px; }
-.store-row .shoe-txt b { font-size: 18px; }
+.store-row .shoe-txt { min-width: 170px; }
+.store-row .shoe-txt b { font-size: 16px; }
 .store-row .shoe-txt small { font-size: 13px; }
-#store-buy { min-width: 240px; background: var(--sol); color: var(--ink); --pour-text: var(--ink); }
+#store-buy { min-width: 220px; background: var(--sol); color: var(--ink); --pour-text: var(--ink); }
 #store-buy:hover { background: #ffcb21; }
 #store-buy.owned { background: var(--soft); color: var(--chalk); }
 #store-buy.blocked { filter: grayscale(1); opacity: .6; }
@@ -5209,7 +5209,7 @@ const updatePeople = function updatePeople(dt) {
     else if (p.vx) { p.x += p.vx * dt; p.ph += Math.abs(p.vx) * dt * 6.5; }   // kids running across the school yard
     const rz = p.z - P.z;
     if ((p.kind === 'gnomo' || p.kind === 'tiktoker') && !p.said && !p.wasHit && game.state === 'play' && rz > 1.2 && rz < 8 && voice(p.kind === 'gnomo' ? 'gnomoHola' : 'tiktokerHola', p.vrate, 1, p)) p.said = true;   // the gnome greets you on sight; the tiktoker comes chanting his dance
-    if (p.kind === 'nene' && !p.said && !p.wasHit && game.state === 'play' && rz > 1.5 && rz < 7) { p.said = true; if (Math.random() < 0.35) voice('neneHola', 1, 1, p); }   // some kids say their thing as they come up
+    if (p.kind === 'nene' && !p.said && !p.wasHit && game.state === 'play' && rz > 1.5 && rz < 7) { p.said = true; if (Math.random() < 0.12) voice('neneHola', p.vrate, 1, p); }   // now and then a kid says his thing as he comes up (kid's pitch)
     if ((p.vz || p.mood > 0) && rz > 0 && rz < 3 && Math.abs(p.x - P.x) < 0.6 && !((p.kind === 'vago' || p.kind === 'muerte') && !p.done) && !(p.giver && !p.done)) p.x += (p.x >= P.x ? 1 : -1) * 0.8 * dt;
     if (p.lying && !p.flying && !stone.lost && !stone.hidden && !stone.fall && !stone.held && game.state !== 'title') {
       // a body across the path: a low stone bumps into it, a lifted one flies over
@@ -5248,8 +5248,9 @@ const personHit = function personHit(p, dx, dz) {
   if (p.mood > 0 || game.state !== 'play') return;
   dropMoney(p);   // pesos fly out of their pockets (once per person; beggars have none)
   const roll = Math.random(), cop = p.kind === 'policia';
-  const own = p.kind === 'nene' ? (Math.random() < 0.5 ? 'nene' : null) : OWN_VOX[p.kind];   // the new characters say their own lines (kids: half the time)
-  const vr = own === 'nene' ? 1 : p.vrate;   // recorded kid lines play at their real pitch
+  // the new characters say their own lines; kids only sometimes (and not twice in a row), otherwise the usual complaints
+  const own = p.kind === 'nene' ? (Math.random() < 0.3 && !(TIME < (VOX.cd.nene || 0)) ? 'nene' : null) : OWN_VOX[p.kind];
+  const vr = p.vrate;   // kids' lines pitched up like every kid's voice
   p.wasHit = true;
   p.mood = 2.6; p.stop = 1.5; p.hitT = 0; p.kbx = -nx; p.kbz = -nz; p.done = false;
   impactFx(s.x, 0.15, s.z);
@@ -7416,8 +7417,8 @@ const VP = {
   tiktokerHola: { ids: ['p03'], p: 1, cd: 0 },                // chanting his dance (ay ay ay, saca taca taca) as he comes dancing up
   doctor: { ids: ['q05', 'q06'], p: 1, cd: 0 },                // the doctor you hit, as he gives you the shot
   hippie: { ids: ['q07', 'q08'], p: 1, cd: 0 },                // the brownie hippie
-  nene: { ids: ['q09', 'q10'], p: 1, cd: 0 },                  // kids: their own lines when hit…
-  neneHola: { ids: ['q09', 'q10'], p: 1, cd: 0 },              // …and now and then walking up to you
+  nene: { ids: ['q09', 'q10'], p: 1, cd: 8 },                  // kids: their own lines (¡Hola, soy Chipi! / six seven) when hit, not too often…
+  neneHola: { ids: ['q09', 'q10'], p: 1, cd: 16 },             // …and once in a while walking up to you
   ciclista: { ids: ['n07', 'n08'], p: 1, cd: 0 },             // the cyclist you knocked off his bike
   patea: { ids: ['e10', 'e11', 'e12', 'e13', 'e14', 'E17', 'E18', 'e15'], p: 1, cd: 0 },
   agarra: { ids: ['E02'], p: 1, cd: 0 },
@@ -7436,7 +7437,7 @@ const VTXT = {
   E07: '¡DAME TODO, GUACHO!', E08: '¡AY!', E09: '¡JAJAJA!', E10: '¡EH!', E11: '¿Y VOS QUÉ TE PASA?', E12: '¡ME GOLPEASTE!', E13: '¡JAJA!',
   w01: '¡OLÉ!', w02: '¿A DÓNDE VAS?', w03: '¡PARÁ!', w04: '¿QUÉ HACÉS, BOLUDO?',
   E14: '¡HEY!', E15: '¡EH, VOS, PIBE!', E17: '¡LA CONCHA DE TU MADRE!', E18: '¡LA PUTA QUE TE PARIÓ!', E19: '¿Y A VOS QUÉ TE PASA?', E20: '¡ME GOLPEASTE EL ZAPATO!', E21: '¡AY, NO PUEDE SER!',
-  q05: '¡AGUANTATE EL PINCHAZO!', q06: '¡ACÁ TENÉS TU DOSIS!', q07: '¡EH, MÁGICO!', q08: '¡ESTO TE VA A DEJAR LOCO!', q10: '¡SIX SEVEN!',
+  q05: '¡AGUANTATE EL PINCHAZO!', q06: '¡ACÁ TENÉS TU DOSIS!', q07: '¡EH, MÁGICO!', q08: '¡ESTO TE VA A DEJAR LOCO!', q09: '¡HOLA, SOY CHIPI!', q10: '¡SIX SEVEN!',
 };
 // per-sheet level trim (all sheets share the same filter now)
 const VOX_GAIN = { jug: 1, jugA: 1, ext: 1, extA: 1, extW: 1, extN: 1, extP: 1, extQ: 1 };
@@ -7451,7 +7452,7 @@ const voice = function voice(pool, rate, vol, who) {
   if (P.pj) {
     if (Math.random() > P.p || TIME < VOX.cdJug || TIME < (VOX.cd[pool] || 0)) return null;
     VOX.cdJug = TIME + 2.2; VOX.cd[pool] = TIME + P.cd;
-  }
+  } else if (P.cd && TIME < (VOX.cd[pool] || 0)) return null;   // said too recently
   let id = P.ids[(Math.random() * P.ids.length) | 0];
   if (P.ids.length > 1 && id === VOX.last[pool]) id = P.ids[(P.ids.indexOf(id) + 1) % P.ids.length];
   const set = VSET[id[0]], buf = VOX.buf[set], seg = VOX_IDX[set] && VOX_IDX[set][id.slice(1)];
@@ -7489,6 +7490,7 @@ const voice = function voice(pool, rate, vol, who) {
   // someone on the street talking: a speech bubble over them while their line plays
   if (who && set[0] === 'e' && VTXT[id] && game.state === 'play') bubble(who, VTXT[id], at - now, dur);
   VOX.last[pool] = id;
+  if (!P.pj && P.cd) VOX.cd[pool] = TIME + P.cd;   // some people's lines (the kids') wait a while before they can come up again
   return id;
 }
 // ---------- speech bubbles that follow whoever is talking ----------
