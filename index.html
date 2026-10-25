@@ -417,41 +417,31 @@ body {
   background: radial-gradient(ellipse 60% 45% at 30% 35%, #fff 0 40%, transparent 70%), radial-gradient(ellipse 55% 40% at 72% 62%, #fff 0 38%, transparent 70%), linear-gradient(#f6f9ff, #dfe9f5); }
 @media (min-width: 600px) { .store-tabs button { font-size: 15px; min-height: 38px; padding: 0 15px; } .store-row .shoe-txt b { font-size: 16px; } #store-buy { min-width: 220px; } }
 
-/* ---------- first-run tips: small, never in the way (taps go straight through to the game), each gone for good once you've done it ---------- */
-.coach { position: absolute; left: 50%; top: 31%; z-index: 4; pointer-events: none; display: grid; justify-items: center; gap: 8px; transform: translate(-50%, 0); animation: coachIn .25s ease-out both; }
-.coach[hidden] { display: none; }
-.coach-txt { position: relative; margin: 0; display: grid; gap: 2px; justify-items: center; width: max-content; max-width: min(74vw, 290px); padding: 6px 12px 7px; border-radius: 12px;
-  background: rgba(21, 18, 28, .8); color: #fff; text-align: center; box-shadow: 0 2px 0 rgba(0, 0, 0, .35); }
-.coach-txt b { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: .02em; line-height: 1.2; text-wrap: balance; }
-.coach-txt small { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.2; color: rgba(255, 255, 255, .86); }
-.coach-txt small:empty { display: none; }
-.coach-txt .bill { width: 20px; height: 11px; }
-.coach.perfect .coach-txt b { color: var(--sol); }
-.coach.plata .coach-txt b { color: #8ef0a0; }
-/* the hand showing a tap to the left, a tap to the right, then a swipe up */
-.coach-hand { position: relative; width: 28px; height: 34px; display: none; }
-.coach.aim .coach-hand { display: block; animation: coachHand 3.4s ease-in-out infinite; }
-.coach-hand svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .35)); }
-.coach-ripple { position: absolute; left: 7px; top: -6px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; opacity: 0; animation: coachRipple 3.4s ease-out infinite; }
-@keyframes coachHand {
-  0% { transform: translate(-48px, 0); } 8% { transform: translate(-48px, 3px) scale(.88); } 14%, 26% { transform: translate(-48px, 0); }
-  36% { transform: translate(48px, 0); } 42% { transform: translate(48px, 3px) scale(.88); } 48%, 58% { transform: translate(48px, 0); }
-  66% { transform: translate(0, 22px); opacity: 1; } 86% { transform: translate(0, -30px); opacity: 1; } 94%, 100% { transform: translate(0, -30px); opacity: 0; }
-}
-@keyframes coachRipple { 0%, 6% { opacity: 0; transform: scale(.3); } 9% { opacity: .9; transform: scale(.6); } 18%, 39% { opacity: 0; transform: scale(1.8); } 40% { opacity: 0; transform: scale(.3); } 43% { opacity: .9; transform: scale(.6); } 52%, 100% { opacity: 0; transform: scale(1.8); } }
-@keyframes coachIn { from { opacity: 0; } to { opacity: 1; } }
-/* tips pinned to something: beside the stone (pointing at its ring), or over a person (pointing down at them) */
-.coach.side-r { transform: translate(18px, -50%); }
-.coach.side-l { transform: translate(calc(-100% - 18px), -50%); }
-.coach.down { transform: translate(-50%, -100%); }
-.coach.side-r .coach-txt::after, .coach.side-l .coach-txt::after, .coach.down .coach-txt::after { content: ''; position: absolute; width: 10px; height: 10px; background: rgba(21, 18, 28, .8); }
-.coach.side-r .coach-txt::after { left: -5px; top: 50%; transform: translateY(-50%) rotate(45deg); }
-.coach.side-l .coach-txt::after { right: -5px; top: 50%; transform: translateY(-50%) rotate(45deg); }
-.coach.down .coach-txt::after { left: calc(50% + var(--ax, 0px)); bottom: -5px; transform: translateX(-50%) rotate(45deg); }
-@media (prefers-reduced-motion: reduce) { .coach.aim .coach-hand, .coach-ripple { animation-duration: 5s; } }
-.coach.perfect.down { margin-top: -16px; }
-.coach.up { transform: translate(-50%, 12px); }
-.coach.up .coach-txt::after { content: ''; position: absolute; width: 10px; height: 10px; background: rgba(21, 18, 28, .8); left: calc(50% + var(--ax, 0px)); top: -5px; transform: translateX(-50%) rotate(45deg); }
+/* ---------- first-game tips: a little pixel dialog box at the bottom (over the belly, never over the stone).
+   It shows up a few seconds before you need it, and you keep playing; each one appears once ---------- */
+.tipcard { position: absolute; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 4; pointer-events: none;
+  width: min(calc(100% - 28px), 400px); box-sizing: border-box; transform: translateX(-50%);
+  display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; padding: 10px 14px 15px 10px;
+  background: #1b1724; color: #f4f1e6;
+  /* a chunky pixel frame: four flat edges and no corners, so the corners come out stepped */
+  box-shadow: 0 -4px 0 #f4f1e6, 0 4px 0 #f4f1e6, -4px 0 0 #f4f1e6, 4px 0 0 #f4f1e6, 0 9px 0 rgba(0, 0, 0, .4);
+  animation: tipIn .3s steps(4, end) both; }
+.tipcard[hidden] { display: none; }
+.tipcard.out { animation: tipOut .24s steps(3, end) both; }
+@keyframes tipIn { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes tipOut { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, 14px); } }
+.tipcard-ico { width: 50px; height: 50px; display: grid; place-items: center; background: #2c2638; box-shadow: inset 0 0 0 3px #3d3550; }
+.tipcard-ico svg { width: 40px; height: 40px; }
+.tipcard-txt { display: grid; gap: 4px; text-align: left; min-width: 0; }
+.tipcard-txt b { font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: .06em; line-height: 1.1; color: var(--sol); }
+.tipcard.poli .tipcard-txt b { color: #ff6b5e; }
+.tipcard-txt span { font-family: var(--font-body); font-size: 14px; line-height: 1.32; text-wrap: pretty; }
+/* how long it stays: a bar that runs down along the bottom */
+.tipcard-bar { position: absolute; left: 10px; right: 14px; bottom: 6px; height: 3px; background: rgba(244, 241, 230, .2); }
+.tipcard-bar i { position: absolute; inset: 0; background: var(--sol); transform-origin: left center; }
+.tipcard-bar i.run { animation: tipBar var(--dur, 5s) linear forwards; }
+@keyframes tipBar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .tipcard, .tipcard.out { animation-duration: .45s; } }
 </style>
 <div id="app">
   <div id="stage">
@@ -472,9 +462,10 @@ body {
       </div>
     </div>
     <div id="hint" hidden>¡AHORA!</div>
-    <div id="coach" class="coach" hidden aria-live="polite">
-      <div class="coach-hand" aria-hidden="true"><i class="coach-ripple"></i><svg viewBox="0 0 16 19" shape-rendering="crispEdges"><path d="M6 1h3v7h1V6h2v2h1V7h2v7l-2 3H5L2 13v-3h2v1h1V2z" fill="#fff" stroke="#15121c" stroke-width="1.2"/><path d="M5 17h8v2H5z" fill="#6cb6ea" stroke="#15121c" stroke-width="1.2"/></svg></div>
-      <p class="coach-txt"><b id="coach-b"></b><small id="coach-s"></small></p>
+    <div id="tipcard" class="tipcard" hidden role="status" aria-live="polite">
+      <div class="tipcard-ico" id="tip-ico" aria-hidden="true"></div>
+      <div class="tipcard-txt"><b id="tip-t"></b><span id="tip-p"></span></div>
+      <i class="tipcard-bar" aria-hidden="true"><i id="tip-bar"></i></i>
     </div>
     <div id="banner" aria-live="polite"></div>
 
@@ -7631,77 +7622,72 @@ const popup = function popup(text, cls, gx, gy, life) {
   setTimeout(() => el.remove(), life || 1100);
 }
 const popupWorld = function popupWorld(text, cls, x, z) { if (proj(x, 0.1, z, PC)) popup(text, cls, PC.x, PC.y - 16); }
-// ---------- first-run tips: they teach while you play (nothing stops, taps go straight through), one at a time,
-// each one shown until you've done the thing and then never again ----------
-const COACH = { seen: store.get('coach', {}), cur: null, t: 0, who: null, cool: 0 };
-const coachLearned = function coachLearned(k) { COACH.seen[k] = 1; store.set('coach', COACH.seen); coachHide(); }
-const coachShow = function coachShow(kind, b, s, pin) {
-  const el = $('coach');
-  if (COACH.cur !== kind) {
-    $('coach-b').textContent = b;
-    const sm = $('coach-s'); sm.replaceChildren();
-    if (kind === 'plata') { const bill = document.createElement('span'); bill.className = 'bill'; sm.append(bill); }
-    sm.append(s || '');
-    el.style.removeProperty('left'); el.style.removeProperty('top');
-    el.hidden = false; COACH.cur = kind; COACH.t = 0;
-  }
-  el.className = 'coach ' + kind + (pin ? ' ' + pin : '');
+// ---------- first-game tips ----------
+// A small dialog box at the bottom with what you need to know, a few seconds BEFORE you need it (you keep playing).
+// Each tip shows once; when you've seen them all they're gone. One cut short (you lost, paused) comes back next time.
+const TIPS = {
+  patear: { ico: 'kick', t: 'CÓMO PATEAR', p: 'Tocá hacia donde querés mandarla, o deslizá: cuanto más rápido, más fuerte.' },
+  perfecta: { ico: 'ring', t: 'PATADA PERFECTA', p: 'Pateá justo cuando el aro de la piedra se pone amarillo. Si las encadenás, vas cada vez más rápido.' },
+  poder: { ico: 'poder', t: 'PODERES', p: 'Al doctor, al hippie y al Diez pegales con la piedra: cada uno te da un poder.' },
+  poli: { ico: 'poli', t: '¡OJO CON LA POLI!', p: 'No le pegues a la policía: te saca la piedra y perdés.' },
+  plata: { ico: 'plata', t: 'PLATA', p: 'Pegale a la gente con la piedra y se le cae plata. Con eso comprás cosas en la tienda.' },
+};
+const TIP_ORDER = ['patear', 'poli', 'poder', 'perfecta', 'plata'];   // priority: the cop or a power-up person coming your way go first
+for (const k in TIPS) TIPS[k].dur = clamp(1.9 + TIPS[k].p.split(' ').length * 0.24, 4.4, 6.5);   // long enough to read calmly
+// 12x12 pixel icons, one letter per pixel
+const TIP_PAL = { k: '#15121c', w: '#f4f1e6', r: '#e04848', R: '#a8302c', y: '#ffd447', Y: '#d99a1c', g: '#8c8c94', G: '#c6c6ce', d: '#5c5c66', b: '#5a7fe0', B: '#2a428c', m: '#62c46e', M: '#2e7a3c' };
+const TIP_ICO = {
+  kick: ['........ggg.', '.......gGGgd', '.w......gggd', '...w.y...dd.', '.w..y.y.....', '.....y......', '..rrr.......', '.rrwrr......', '.rrrrrrr....', 'rrrrrrrrrr..', 'Rwwwwwwwwr..', 'wwwwwwwwwww.'],
+  ring: ['...yyyyyy...', '..y......y..', '.y........y.', 'y...gggg...y', 'y..gGGggd..y', 'y..gGgggd..y', 'y..ggggdd..y', 'y...dddd...y', '.y........y.', '..y......y..', '...yyyyyy...', '............'],
+  poder: ['......yyy...', '.....yyY....', '....yyY.....', '...yyY......', '..yyyyyyyy..', '.......yY...', '......yY....', '.....yY.....', '....yY......', '...yY.......', '..yY........', '.y..........'],
+  poli: ['..........r.', '..........r.', '..BBBBBB..r.', '.BbbyybbB.r.', '.BbbyybbB.r.', '.BBBBBBBB.r.', 'kkkkkkkkkk..', '.kkkk.....r.', '..........r.', '............', '.gggggggg...', '............'],
+  plata: ['............', 'mmmmmmmmmm..', 'mMMMMMMMMm..', 'mM.MMMM.Mm..', 'mM.MwwM.Mm..', 'mM.MMMM.Mm..', 'mMMMMMMMMm..', 'mmmmmmmmmm..', '........yyy.', '.......yYYYy', '.......yYYYy', '........yyy.'],
+};
+const tipIcon = function tipIcon(rows) {
+  let s = '<svg viewBox="0 0 12 12" shape-rendering="crispEdges">';
+  rows.forEach((row, y) => { for (let x = 0; x < row.length; x++) { const c = TIP_PAL[row[x]]; if (c) s += '<rect x="' + x + '" y="' + y + '" width="1.04" height="1.04" fill="' + c + '"/>'; } });
+  return s + '</svg>';
 }
-const coachHide = function coachHide() { if (COACH.cur) { $('coach').hidden = true; COACH.cur = null; } }
-// pins the tip over a point in the world (false when that point is off screen). The label always stays whole on screen;
-// its little arrow slides along to keep pointing at the thing
-const coachAt = function coachAt(x, y, z) {
-  if (!proj(x, y, z, PC)) return false;
-  const el = $('coach'), sw = stage.clientWidth || 1, half = el.offsetWidth / 2, tx = PC.x / W * sw;
-  const cx = clamp(tx, half + 8, Math.max(half + 8, sw - half - 8));
-  el.style.left = cx + 'px'; el.style.top = clamp(PC.y / H * 100, 17, 88) + '%';   // (never up among the HUD)
-  el.style.setProperty('--ax', clamp(tx - cx, -half + 16, half - 16) + 'px');
-  return true;
+const TIP = { seen: store.get('tips', {}), cur: null, t: 0, dur: 0, gap: 0.6, want: {}, all: false };
+TIP.all = TIP_ORDER.every((k) => TIP.seen[k]);
+const tipStart = function tipStart(k) {
+  const d = TIPS[k], el = $('tipcard'), bar = $('tip-bar');
+  $('tip-ico').innerHTML = tipIcon(TIP_ICO[d.ico]);
+  $('tip-t').textContent = d.t; $('tip-p').textContent = d.p;
+  TIP.cur = k; TIP.t = 0; TIP.dur = d.dur;
+  el.className = 'tipcard ' + k; el.style.setProperty('--dur', d.dur + 's'); el.hidden = false;
+  bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run');
 }
-// someone worth pointing at: walking about, in front of you, well inside the screen
-const coachTarget = function coachTarget() {
+const tipEnd = function tipEnd(seen) {
+  const k = TIP.cur, el = $('tipcard');
+  if (!k) return;
+  if (seen) { TIP.seen[k] = 1; store.set('tips', TIP.seen); TIP.all = TIP_ORDER.every((q) => TIP.seen[q]); }
+  TIP.cur = null; TIP.gap = 2.5;   // a breather between tips (the urgent ones wait less)
+  el.classList.add('out'); setTimeout(() => { if (!TIP.cur) el.hidden = true; }, 260);
+}
+const tipTick = function tipTick(dt) {
+  if (TIP.all && !TIP.cur) return;
+  if (game.state !== 'play' || game.jump || !game.run) { if (TIP.cur) tipEnd(TIP.t > 3); return; }
+  const r = game.run, want = TIP.want;
+  // what's coming up decides which tip you get next, while there's still time to read it
+  want.patear = 1;
+  if (r.kicks >= 1) want.perfecta = 1;   // right after your first kick, while the stone rolls away
   for (const p of world.people) {
-    const rz = p.z - P.z;
-    if (p.giver || p.flying || p.lying || p.dropped || p.mood > 0 || !DROPS[p.kind] || p.kind === 'policia' || rz < 4 || rz > 9 || Math.abs(p.x - P.x) > 1.5) continue;
-    if (proj(p.x, 0, p.z, PC) && Math.abs(PC.x - HW) < W * 0.32 && PC.y > H * 0.04 && PC.y < H * 0.62) return p;   // (by their feet: the label goes on the ground in front of them)
+    const rz = p.z - P.z; if (rz < 6 || rz > 30 || p.flying) continue;
+    if (p.giver && !p.done) want.poder = 1;
+    else if (p.kind === 'policia') want.poli = 1;
+    else if (DROPS[p.kind] && r.kicks >= 2) want.plata = 1;
   }
-  return null;
-}
-const coachTick = function coachTick(dt) {
-  const S = COACH.seen, r = game.run;
-  if (game.state !== 'play' || !r || game.jump || P.auto || stone.carry || stone.float) { coachHide(); return; }
-  COACH.t += dt;
-  // 1) how to kick, right from the start: tap where you want it to go, or swipe (faster = harder)
-  if (!S.aim) {
-    coachShow('aim', 'Tocá hacia dónde la querés mandar', 'o deslizá: más rápido, más fuerte');
-    if (r.kicks >= 3 || (r.kicks >= 1 && COACH.t > 10)) coachLearned('aim');
+  const urgent = (want.poli && !TIP.seen.poli) || (want.poder && !TIP.seen.poder);   // a cop or a power-up person on the way
+  if (TIP.cur) {
+    TIP.t += dt;
+    if (TIP.t >= TIP.dur) tipEnd(true);
+    else if (urgent && TIP.cur !== 'poli' && TIP.cur !== 'poder' && TIP.t > 3.5) { tipEnd(true); TIP.gap = 0.5; }   // (already read enough: make way)
     return;
   }
-  // 2) the ring round the stone: kick when it turns yellow for a perfect one (shown while the ring is there)
-  if (!S.perfect) {
-    // (learned once you've seen it a couple of times and landed a perfect one while it was up, or after 5 showings)
-    if (COACH.perfBase !== undefined && r.perfects > COACH.perfBase && (S.perfectN || 0) >= 2) { coachLearned('perfect'); return; }
-    if ((S.perfectN || 0) >= 5) { coachLearned('perfect'); return; }
-    const s = stone, rel = s.z - P.z, wk = winK();
-    const ring = !s.lost && !P.kick && rel < WIN.far * wk && rel > -0.05 && Math.abs(s.x - P.x) < 0.46 && s.y < 0.5;
-    if (ring && proj(s.x, s.y + 0.05, s.z, PC)) {
-      if (COACH.cur !== 'perfect') { S.perfectN = (S.perfectN || 0) + 1; store.set('coach', S); COACH.perfBase = r.perfects; }
-      coachShow('perfect', 'Pateá con el aro amarillo', '¡patada perfecta!', 'down');
-      coachAt(s.x, s.y + 0.05, s.z);   // (above the ring, pointing down at it)
-    } else coachHide();
-    return;
-  }
-  // 3) people drop money when you hit them: pointed out over someone walking towards you
-  if (!S.plata) {
-    if (r.money > 0 || (S.plataN || 0) >= 3) { coachLearned('plata'); return; }
-    let w = COACH.who;
-    if (w && (!world.people.includes(w) || w.z - P.z < 1.4 || w.mood > 0 || w.flying || COACH.t > 4.5)) { w = COACH.who = null; coachHide(); COACH.cool = TIME + 5; }
-    if (!w && TIME > COACH.cool && !$('banner').classList.contains('show')) {   // (not while a level's name is up)
-      w = coachTarget();
-      if (w) { COACH.who = w; S.plataN = (S.plataN || 0) + 1; store.set('coach', S); }
-    }
-    if (w) { coachShow('plata', '¡Pegale con la piedra!', 'se le cae la plata', 'up'); if (!coachAt(w.x, 0, w.z)) coachHide(); }
-  }
+  if (TIP.gap > 0) { TIP.gap -= dt; if (!(urgent && TIP.gap < 1.7)) return; }
+  const k = TIP_ORDER.find((q) => want[q] && !TIP.seen[q]);
+  if (k) tipStart(k);
 }
 let bannerT = 0;
 const banner = function banner(a, b) {
@@ -7741,6 +7727,7 @@ const startGame = function startGame() {
   resetWorld((Math.random() * 1e9) | 0);
   const SL = startLink(); game.testRun = !!SL; game.cheat = false; game.kq.length = 0;   // a test link starts right at that level
   if (SL) jumpTo(SL.z, SL.lap);
+  else if (!TIP.seen.patear) stone.z = 7.5;   // first game: the stone starts a bit further off, so there's time to read how to kick
   game.state = 'play';
   game.run = { kicks: 0, perfects: 0, bestStreak: 0, zone: zoneAt(P.z), money: 0, banked: 0, continues: 0 };
   clearTimeout(contTimer); lossId++;
@@ -8110,7 +8097,7 @@ const tick = function tick(dt) {
   updateCamera(dt);
   render();
   updateBubbles();
-  coachTick(dt);
+  tipTick(dt);
   const m = meters(P.z);
   if (game.state === 'play' && m !== game.lastM) { game.lastM = m; $('hud-m').textContent = m; }
   if (game.state === 'play') {
@@ -8122,7 +8109,7 @@ const tick = function tick(dt) {
     if (game.streak >= 2) { const b = st.querySelector('b'); const v = 'x' + game.streak; if (b.textContent !== v) b.textContent = v; st.classList.toggle('hot', game.streak >= 5); }
   }
 }
-if (location.hostname === 'localhost') window.__pp = { EZE, newMaestra, COACH, coachTarget, projTest(x, y, z) { return proj(x, y, z, PC) ? { x: PC.x / W, y: PC.y / H } : null; }, get TIME() { return TIME; }, STORE, openStore, closeStore, storeTab, storeStep, storeBuy, continueRun, dropMoney, contPrice, get PLATA() { return PLATA; }, set PLATA(v) { PLATA = v; savePlata(); }, get OWNED() { return OWNED; }, OUTFITS, SHOES, STONES, ZD, ORDER, isUnlocked, tryStart, sideSwipe, throwStone, smashWave, newBikeZ, newMoto, newMuerte, fitStep, shoeStep, stoneStep, lockedPick, get ACH() { return ACH; }, setAllSkins(v) { ALL_SKINS = v; }, game, P, stone, world, look, cam, doKick, startGame, resetWorld, render, renderWorld, update, zoneAt, KD, tick, get W() { return W; }, O, newVago, newCartonero, fireBarrel, newPerson, startPower, endPower, VOX, personHit, newGiver, juggleTap, tapAt, swipeKick, stuckOn, newBike, AU, silentWav, mediaPlayback, JG, setRunFrom(v) { RUN_FROM = v; },
+if (location.hostname === 'localhost') window.__pp = { EZE, newMaestra, get TIP() { return TIP; }, get TIME() { return TIME; }, STORE, openStore, closeStore, storeTab, storeStep, storeBuy, continueRun, dropMoney, contPrice, get PLATA() { return PLATA; }, set PLATA(v) { PLATA = v; savePlata(); }, get OWNED() { return OWNED; }, OUTFITS, SHOES, STONES, ZD, ORDER, isUnlocked, tryStart, sideSwipe, throwStone, smashWave, newBikeZ, newMoto, newMuerte, fitStep, shoeStep, stoneStep, lockedPick, get ACH() { return ACH; }, setAllSkins(v) { ALL_SKINS = v; }, game, P, stone, world, look, cam, doKick, startGame, resetWorld, render, renderWorld, update, zoneAt, KD, tick, get W() { return W; }, O, newVago, newCartonero, fireBarrel, newPerson, startPower, endPower, VOX, personHit, newGiver, juggleTap, tapAt, swipeKick, stuckOn, newBike, AU, silentWav, mediaPlayback, JG, setRunFrom(v) { RUN_FROM = v; },
   warp(z, night) {
     resetWorld(12345);
     P.z = z; world.genZ = Math.floor((z - 4) / 5) * 5; world.lastHazard = z;
