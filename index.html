@@ -368,20 +368,25 @@ body {
 .pour-btn.cont.counting .cd { animation: contCd 7s linear forwards; }
 @keyframes contCd { to { transform: scaleX(0); } }
 
-/* ---------- buttons a bit bigger than the originals (between the first size and the big one, which was too much) ---------- */
-.pour-btn { height: 44px; padding: 0 18px; font-size: 15px; }
-.pour-btn.icon { width: 44px; padding: 0; }
-.pour-btn svg { width: 18px; height: 18px; }
-.pour-btn.main { height: 52px; padding: 0 32px; font-size: 18px; }
-.pour-btn.play { font-size: 19px; }
-.pour-btn.play svg { width: 15px; height: 15px; }
-.title .shop { height: 46px; padding: 0 22px; font-size: 16px; margin-top: 10px; }
-.title .shop svg { width: 18px; height: 18px; }
-.title .shop .arr { width: 13px; height: 13px; }
-.title .shoe-txt { min-width: 140px; }
-.title .shoe-txt b { font-size: 16px; }
-.title .shoe-txt small { font-size: 12px; }
-.rec { font-size: 15px; padding: 8px 13px; }
+/* ---------- buttons: the original size on phones (bigger was too much there), a little bigger on wide screens ---------- */
+@media (min-width: 600px) {
+  .pour-btn { height: 44px; padding: 0 18px; font-size: 15px; }
+  .pour-btn.icon { width: 44px; padding: 0; }
+  .pour-btn svg { width: 18px; height: 18px; }
+  .pour-btn.main { height: 52px; padding: 0 32px; font-size: 18px; }
+  .pour-btn.play { font-size: 19px; }
+  .pour-btn.play svg { width: 15px; height: 15px; }
+  .title .shop { height: 46px; padding: 0 22px; font-size: 16px; margin-top: 10px; }
+  .title .shop svg { width: 18px; height: 18px; }
+  .title .shop .arr { width: 13px; height: 13px; }
+  .title .shoe-txt { min-width: 140px; }
+  .title .shoe-txt b { font-size: 16px; }
+  .title .shoe-txt small { font-size: 12px; }
+  .rec { font-size: 15px; padding: 8px 13px; }
+  .store-tabs button { font-size: 15px; min-height: 38px; padding: 0 15px; }
+  .store-row .shoe-txt b { font-size: 16px; }
+  #store-buy { min-width: 220px; }
+}
 .rec .bill { width: 24px; height: 13px; }
 .hud-plata { top: 72px; font-size: 21px; padding: 7px 14px 7px 11px; gap: 9px; }
 .hud-plata .bill { width: 30px; height: 17px; }
@@ -395,14 +400,14 @@ body {
 .store-sub { color: var(--chalk); font-size: 15px; max-width: 300px; text-wrap: balance; opacity: .9; }
 .store-bottom { position: absolute; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translateX(-50%); display: grid; gap: 10px; justify-items: center; width: min(94%, 400px); }
 .store-tabs { display: flex; gap: 4px; background: rgba(21, 18, 28, .72); padding: 5px; border-radius: 999px; }
-.store-tabs button { border: 0; cursor: pointer; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 600; font-size: 15px; min-height: 38px; padding: 0 15px; border-radius: 999px; }
+.store-tabs button { border: 0; cursor: pointer; background: transparent; color: var(--muted); font-family: var(--font-body); font-weight: 600; font-size: 14px; min-height: 34px; padding: 0 14px; border-radius: 999px; }
 .store-tabs button.on { background: var(--sol); color: var(--ink); }
 .store-tabs button:focus-visible { outline: 2px solid var(--sol); outline-offset: 2px; }
 .store-row { background: rgba(21, 18, 28, .72); border-radius: 999px; padding: 5px; }
 .store-row .shoe-txt { min-width: 170px; }
-.store-row .shoe-txt b { font-size: 16px; }
+.store-row .shoe-txt b { font-size: 15px; }
 .store-row .shoe-txt small { font-size: 13px; }
-#store-buy { min-width: 220px; background: var(--sol); color: var(--ink); --pour-text: var(--ink); }
+#store-buy { min-width: 200px; background: var(--sol); color: var(--ink); --pour-text: var(--ink); }
 #store-buy:hover { background: #ffcb21; }
 #store-buy.owned { background: var(--soft); color: var(--chalk); }
 #store-buy.blocked { filter: grayscale(1); opacity: .6; }
@@ -410,6 +415,7 @@ body {
 /* ---------- jumping off the plane: the screen goes white in the clouds, then clears over the barrio ---------- */
 #whiteout { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
   background: radial-gradient(ellipse 60% 45% at 30% 35%, #fff 0 40%, transparent 70%), radial-gradient(ellipse 55% 40% at 72% 62%, #fff 0 38%, transparent 70%), linear-gradient(#f6f9ff, #dfe9f5); }
+@media (min-width: 600px) { .store-tabs button { font-size: 15px; min-height: 38px; padding: 0 15px; } .store-row .shoe-txt b { font-size: 16px; } #store-buy { min-width: 220px; } }
 </style>
 <div id="app">
   <div id="stage">
@@ -3091,6 +3097,17 @@ const newVago = function newVago(x, z, vz, rng) {
 }
 // in Glew it's la Muerte who comes for you instead of the beggars (same grab, scythe and all)
 const newMuerte = function newMuerte(x, z, vz, rng) { return newPerson('muerte', x, z, vz, rng); }
+// in the school it's the teachers ("la seño"): big, in a dress, glasses, hands on her hips; she comes for you and grabs your arm
+const newMaestra = function newMaestra(x, z, vz, rng) {
+  const p = newPerson('senora', x, z, vz, rng);
+  Object.assign(p, {
+    kind: 'maestra', h: 1.62, fat: 1.6, belly: true, wide: 1.5, r: 0.26, dress: true, pose: 'hips', bag: null, shorts: false, cane: false,
+    shirt: pick([[156, 60, 84], [70, 96, 150], [120, 70, 130], [190, 120, 60], [96, 130, 96]], rng), pants: [60, 56, 70], shoes: [50, 40, 36],
+    hair: pick([[90, 60, 40], [40, 30, 26], [180, 120, 70], [206, 196, 186]], rng), bouffant: true, glasses: true, glassCol: [70, 40, 40],
+    skin: pick([[232, 186, 150], [206, 150, 112], [176, 120, 86]], rng), vrate: 1.17 + rng() * 0.05,
+  });
+  return p;
+}
 const newCartonero = function newCartonero(x, z, rng) {
   const o = O('carro', x, z, { mv: -0.65 });
   const p = newPerson('adulto', x, z + 0.95, -0.65, rng);
@@ -5209,8 +5226,9 @@ const updatePeople = function updatePeople(dt) {
     else if (p.vx) { p.x += p.vx * dt; p.ph += Math.abs(p.vx) * dt * 6.5; }   // kids running across the school yard
     const rz = p.z - P.z;
     if ((p.kind === 'gnomo' || p.kind === 'tiktoker') && !p.said && !p.wasHit && game.state === 'play' && rz > 1.2 && rz < 8 && voice(p.kind === 'gnomo' ? 'gnomoHola' : 'tiktokerHola', p.vrate, 1, p)) p.said = true;   // the gnome greets you on sight; the tiktoker comes chanting his dance
-    if (p.kind === 'nene' && !p.said && !p.wasHit && game.state === 'play' && rz > 1.5 && rz < 7) { p.said = true; if (Math.random() < 0.12) voice('neneHola', p.vrate, 1, p); }   // now and then a kid says his thing as he comes up (kid's pitch)
-    if ((p.vz || p.mood > 0) && rz > 0 && rz < 3 && Math.abs(p.x - P.x) < 0.6 && !((p.kind === 'vago' || p.kind === 'muerte') && !p.done) && !(p.giver && !p.done)) p.x += (p.x >= P.x ? 1 : -1) * 0.8 * dt;
+    // now and then a kid shouts something as he goes past (kid's pitch); very rarely it's Chipi introducing himself
+    if (p.kind === 'nene' && !p.said && !p.wasHit && game.state === 'play' && rz > 1.5 && rz < 7) { p.said = true; if (Math.random() < 0.22) voice(Math.random() < 0.06 ? 'chipi' : 'neneHola', p.vrate, 1, p); }
+    if ((p.vz || p.mood > 0) && rz > 0 && rz < 3 && Math.abs(p.x - P.x) < 0.6 && !((p.kind === 'vago' || p.kind === 'muerte' || p.kind === 'maestra') && !p.done) && !(p.giver && !p.done)) p.x += (p.x >= P.x ? 1 : -1) * 0.8 * dt;
     if (p.lying && !p.flying && !stone.lost && !stone.hidden && !stone.fall && !stone.held && game.state !== 'title') {
       // a body across the path: a low stone bumps into it, a lifted one flies over
       const s = stone, cx = p.x + p.lieDir * p.h * 0.5;
@@ -5228,7 +5246,8 @@ const updatePeople = function updatePeople(dt) {
       const dx = stone.x - p.x, dz = stone.z - p.z, r = p.r + (p.giver && !p.done ? 0.16 : 0.06);
       if (dx * dx + dz * dz < r * r) {
         // a stone that is barely moving: the person steps around it instead of shoving it at you
-        if ((Math.hypot(stone.vx, stone.vz) < 1.2 || stone.float) && !(p.giver && !p.done) && !smashOn()) p.x = stone.x - (dx >= 0 ? 1 : -1) * Math.sqrt(Math.max(0, r * r - dz * dz));
+        // (the school's teacher doesn't: she steps right over it and keeps coming for you; kick it into her to stop her)
+        if ((Math.hypot(stone.vx, stone.vz) < 1.2 || stone.float) && !(p.giver && !p.done) && !smashOn()) { if (!(p.kind === 'maestra' && !p.done)) p.x = stone.x - (dx >= 0 ? 1 : -1) * Math.sqrt(Math.max(0, r * r - dz * dz)); }
         else personHit(p, dx, dz);
       }
     }
@@ -5249,12 +5268,17 @@ const personHit = function personHit(p, dx, dz) {
   dropMoney(p);   // pesos fly out of their pockets (once per person; beggars have none)
   const roll = Math.random(), cop = p.kind === 'policia';
   // the new characters say their own lines; kids only sometimes (and not twice in a row), otherwise the usual complaints
-  const own = p.kind === 'nene' ? (Math.random() < 0.3 && !(TIME < (VOX.cd.nene || 0)) ? 'nene' : null) : OWN_VOX[p.kind];
+  const own = p.kind === 'nene' ? (Math.random() < 0.2 && !(TIME < (VOX.cd.nene || 0)) ? 'nene' : null) : OWN_VOX[p.kind];
   const vr = p.vrate;   // kids' lines pitched up like every kid's voice
   p.wasHit = true;
   p.mood = 2.6; p.stop = 1.5; p.hitT = 0; p.kbx = -nx; p.kbz = -nz; p.done = false;
   impactFx(s.x, 0.15, s.z);
   sfx.tonk(4);
+  if (p.kind === 'maestra') {   // a pebble doesn't stop the seño: a quick complaint and she keeps coming for you (dodge her with a kick to the side)
+    p.mood = 0.75; p.stop = 0.6; p.react = 'queja';
+    voice('queja', p.vrate, 1, p);
+    return;
+  }
   if (p.kind === 'profe' || p.kind === 'anciano' || p.kind === 'gnomo') {
     // teachers and old people go down flat on their back (books everywhere), then get up and carry on
     p.react = 'cae'; p.stop = 3.6; p.mood = 3.6;
@@ -6733,8 +6757,9 @@ const updateExtras = function updateExtras(dt) {
       const x = clamp(P.x + (Math.random() - 0.5) * 1.2, -1.2, 1.0);
       if (inAir(P.z + 28)) { /* nobody out past the plane's nose */ }
       else if (k === 'glew') newMuerte(x, P.z + 28, -0.75, Math.random);   // in Glew it's la Muerte who comes for you
-      else if (k !== 'cole' && k !== 'ruta6') newVago(x, P.z + 28, -0.75, Math.random);   // no beggars in the school or on the highway
-      world.vagoT = (7 + Math.random() * 6) * (look.night > 0.5 ? 0.7 : 1);   // about one every 10 s
+      else if (k === 'cole') newMaestra(x, P.z + 28, -0.8, Math.random);   // in the school, the teachers (and more often: the school is harder)
+      else if (k !== 'ruta6') newVago(x, P.z + 28, -0.75, Math.random);    // no beggars on the highway
+      world.vagoT = (k === 'cole' ? 5 + Math.random() * 3.5 : 7 + Math.random() * 6) * (look.night > 0.5 ? 0.7 : 1);   // about one every 10 s (every 7 in the school)
     }
   }
   for (const p of world.people) {
@@ -6744,19 +6769,20 @@ const updateExtras = function updateExtras(dt) {
       if (f.y < 0 && f.vy < 0) { f.y = 0; f.vy = 0; f.vx *= 0.3; f.vz *= 0.3; }
       continue;
     }
-    if (p.kind !== 'vago' && p.kind !== 'muerte') continue;
-    const rz = p.z - P.z;
+    if (p.kind !== 'vago' && p.kind !== 'muerte' && p.kind !== 'maestra') continue;
+    const rz = p.z - P.z, seno = p.kind === 'maestra';   // the teacher tells you off instead of asking for change
     // he heads for you from afar, but slowly, and once he's close he keeps to his line: a kick to the side gets you past him
-    if (!p.done && rz > 3.2 && rz < 10 && p.mood <= 0) p.x += clamp(P.x - p.x, -1, 1) * 0.4 * dt;
+    // (the teacher is sharper: she follows you faster and for longer, and reaches a bit further)
+    if (!p.done && rz > (seno ? 2.3 : 3.2) && rz < 10 && p.mood <= 0) p.x += clamp(P.x - p.x, -1, 1) * (seno ? 0.65 : 0.4) * dt;
     if (!p.asked && rz < 8 && rz > 0 && game.state === 'play') {
       // he asks from a few steps away, so his line is over before he reaches you
       p.asked = true; p.asking = true;
-      voice('pide', p.vrate, 1, p);
+      voice(seno ? 'reto' : 'pide', p.vrate, 1, p);
     }
-    if (!p.grabbed && !powerOn('pucho') && p.mood <= 0 && rz < 1.2 && rz > 0.5 && Math.abs(p.x - P.x) < 0.36 && game.state === 'play' && !P.slip && !P.auto) {
+    if (!p.grabbed && !powerOn('pucho') && p.mood <= 0 && rz < 1.2 && rz > 0.5 && Math.abs(p.x - P.x) < (seno ? 0.44 : 0.36) && game.state === 'play' && !P.slip && !P.auto) {
       // he grabs your arm for a moment: you get yanked back (about half your speed) and lose the streak, but he never touches the stone
       p.grabbed = true; p.done = true; p.stop = 1.2; P.stopT = 0.45; game.streak = 0; game.shake = Math.max(game.shake, 0.6);
-      voice('dameTodo', p.vrate, 1, p); later(0.4, () => voice('vago'));
+      voice(seno ? 'seno' : 'dameTodo', p.vrate, 1, p); later(0.4, () => voice('vago'));
     }
     if (p.done && p.stop <= 0) p.x += (p.x >= P.x ? 1 : -1) * 1.0 * dt;
   }
@@ -7019,7 +7045,7 @@ const savePlata = function savePlata() { store.set('plata', PLATA); store.set('o
 // Beggars, la Muerte, the police and the power-up givers have nothing to give (they aren't in the list).
 const DROPS = {
   nene: [0.8, 500, 1000], anciano: [0.9, 500, 1500], jogger: [0.6, 500, 2000], pescador: [0.7, 500, 2000],   // coins
-  adulto: [0.85, 2000, 5000], senora: [0.9, 2000, 6000], profe: [0.8, 2000, 4000], turro: [0.85, 2000, 8000],
+  adulto: [0.85, 2000, 5000], senora: [0.9, 2000, 6000], profe: [0.8, 2000, 4000], maestra: [0.9, 2000, 5000], turro: [0.85, 2000, 8000],
   gordo: [0.9, 2000, 6000], arana: [0.9, 2000, 6000], gaucho: [0.8, 2000, 5000], tiktoker: [0.9, 3000, 8000],
   ciclista: [0.8, 2000, 4000], motoquero: [0.9, 3000, 6000],
   diva: [0.95, 5000, 15000], tele: [1, 15000, 30000], bicibandido: [1, 15000, 30000],   // the rich ones, and a thief's loot
@@ -7417,8 +7443,11 @@ const VP = {
   tiktokerHola: { ids: ['p03'], p: 1, cd: 0 },                // chanting his dance (ay ay ay, saca taca taca) as he comes dancing up
   doctor: { ids: ['q05', 'q06'], p: 1, cd: 0 },                // the doctor you hit, as he gives you the shot
   hippie: { ids: ['q07', 'q08'], p: 1, cd: 0 },                // the brownie hippie
-  nene: { ids: ['q09', 'q10'], p: 1, cd: 8 },                  // kids: their own lines (¡Hola, soy Chipi! / six seven) when hit, not too often…
-  neneHola: { ids: ['q09', 'q10'], p: 1, cd: 16 },             // …and once in a while walking up to you
+  nene: { ids: ['q10'], p: 1, cd: 8 },                         // kids, now and then when hit: six seven (otherwise the usual complaints, pitched up)
+  neneHola: { ids: ['e04', 'e08', 'E09', 'E13', 'E14', 'e15', 'e17', 'w03', 'q10'], p: 1, cd: 5 },   // kids shouting as they run past: ¡Eh! ¡Ey! ¡Jajaja! ¡Correte, gil! ¡Movete! ¡Pará! six seven
+  chipi: { ids: ['q09'], p: 1, cd: 30 },                       // ¡Hola, soy Chipi!: rare
+  reto: { ids: ['w02', 'E15'], p: 1, cd: 0 },                  // the school's teacher coming for you: ¿A dónde vas? / ¡Eh, vos, pibe!
+  seno: { ids: ['w03', 'E11', 'w04'], p: 1, cd: 0 },           // ...and grabbing your arm: ¡Pará! / ¿Y vos qué te pasa? / ¿Qué hacés, boludo?
   ciclista: { ids: ['n07', 'n08'], p: 1, cd: 0 },             // the cyclist you knocked off his bike
   patea: { ids: ['e10', 'e11', 'e12', 'e13', 'e14', 'E17', 'E18', 'e15'], p: 1, cd: 0 },
   agarra: { ids: ['E02'], p: 1, cd: 0 },
@@ -7446,7 +7475,7 @@ const VOX_GAIN = { jug: 1, jugA: 1, ext: 1, extA: 1, extW: 1, extN: 1, extP: 1, 
 // Quick reactions (celebrations, grunts) are dropped if they'd have to wait; important ones queue up to ~3.5 s.
 const VOX_QUICK = new Set(['perfecto', 'racha', 'patada', 'tarde', 'jueguito', 'choque', 'rage', 'power', 'paso']);
 // the reaction of whoever you just hit: never waits in line behind other voices
-const VOX_URGENT = new Set(['queja', 'patea', 'poli', 'ole', 'dameTodo', 'auto', 'gordo', 'gnomo', 'diva', 'ciclista', 'tiktoker', 'doctor', 'hippie', 'nene']);
+const VOX_URGENT = new Set(['queja', 'patea', 'poli', 'ole', 'dameTodo', 'seno', 'auto', 'gordo', 'gnomo', 'diva', 'ciclista', 'tiktoker', 'doctor', 'hippie', 'nene']);
 const voice = function voice(pool, rate, vol, who) {
   const P = VP[pool]; if (!P) return null;
   if (P.pj) {
@@ -7980,7 +8009,7 @@ const tick = function tick(dt) {
     if (game.streak >= 2) { const b = st.querySelector('b'); const v = 'x' + game.streak; if (b.textContent !== v) b.textContent = v; st.classList.toggle('hot', game.streak >= 5); }
   }
 }
-if (location.hostname === 'localhost') window.__pp = { EZE, get TIME() { return TIME; }, STORE, openStore, closeStore, storeTab, storeStep, storeBuy, continueRun, dropMoney, contPrice, get PLATA() { return PLATA; }, set PLATA(v) { PLATA = v; savePlata(); }, get OWNED() { return OWNED; }, OUTFITS, SHOES, STONES, ZD, ORDER, isUnlocked, tryStart, sideSwipe, throwStone, smashWave, newBikeZ, newMoto, newMuerte, fitStep, shoeStep, stoneStep, lockedPick, get ACH() { return ACH; }, setAllSkins(v) { ALL_SKINS = v; }, game, P, stone, world, look, cam, doKick, startGame, resetWorld, render, renderWorld, update, zoneAt, KD, tick, get W() { return W; }, O, newVago, newCartonero, fireBarrel, newPerson, startPower, endPower, VOX, personHit, newGiver, juggleTap, tapAt, swipeKick, stuckOn, newBike, AU, silentWav, mediaPlayback, JG, setRunFrom(v) { RUN_FROM = v; },
+if (location.hostname === 'localhost') window.__pp = { EZE, newMaestra, get TIME() { return TIME; }, STORE, openStore, closeStore, storeTab, storeStep, storeBuy, continueRun, dropMoney, contPrice, get PLATA() { return PLATA; }, set PLATA(v) { PLATA = v; savePlata(); }, get OWNED() { return OWNED; }, OUTFITS, SHOES, STONES, ZD, ORDER, isUnlocked, tryStart, sideSwipe, throwStone, smashWave, newBikeZ, newMoto, newMuerte, fitStep, shoeStep, stoneStep, lockedPick, get ACH() { return ACH; }, setAllSkins(v) { ALL_SKINS = v; }, game, P, stone, world, look, cam, doKick, startGame, resetWorld, render, renderWorld, update, zoneAt, KD, tick, get W() { return W; }, O, newVago, newCartonero, fireBarrel, newPerson, startPower, endPower, VOX, personHit, newGiver, juggleTap, tapAt, swipeKick, stuckOn, newBike, AU, silentWav, mediaPlayback, JG, setRunFrom(v) { RUN_FROM = v; },
   warp(z, night) {
     resetWorld(12345);
     P.z = z; world.genZ = Math.floor((z - 4) / 5) * 5; world.lastHazard = z;
