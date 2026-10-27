@@ -443,8 +443,44 @@ body {
 @keyframes tipBar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 @media (prefers-reduced-motion: reduce) { .tipcard, .tipcard.out { animation-duration: .45s; } }
 .pour-btn.snd { gap: 8px; min-width: 200px; } .pour-btn.snd .ic { display: inline-grid; } .pour-btn.snd svg { width: 18px; height: 18px; }
+
+/* ---------- the intro every time the game opens: Empanada de Pollo Inc. (tap to skip) ---------- */
+.intro { position: absolute; inset: 0; z-index: 50; display: grid; place-items: center; cursor: pointer;
+  background: radial-gradient(70% 55% at 50% 46%, #2a2236 0%, #120f18 70%); }
+.intro[hidden] { display: none; }
+.intro.out { animation: introOut .45s steps(5, end) forwards; pointer-events: none; }
+@keyframes introOut { to { opacity: 0; } }
+.intro-logo { display: grid; justify-items: center; gap: clamp(14px, 3.5vh, 26px); transform: translateY(-4%); }
+/* the empanada: pixel art, dropped in with a squash, steam coming off it */
+.intro-emp { position: relative; width: min(52vw, 230px); aspect-ratio: 34 / 21; animation: empDrop .62s cubic-bezier(.3, 0, .7, 1) both; transform-origin: 50% 100%; }
+.intro-emp svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .45)); }
+@keyframes empDrop {
+  0% { transform: translateY(-75vh); } 58% { transform: translateY(0) scale(1, 1); }
+  68% { transform: translateY(0) scale(1.14, .82); } 80% { transform: translateY(-4%) scale(.95, 1.06); } 90% { transform: translateY(0) scale(1.03, .97); } 100% { transform: translateY(0) scale(1); }
+}
+.steam { position: absolute; bottom: 88%; width: 6%; height: 26%; opacity: 0;
+  background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .55)); clip-path: polygon(30% 0, 70% 0, 70% 30%, 100% 30%, 100% 65%, 60% 65%, 60% 100%, 20% 100%, 20% 60%, 0 60%, 0 25%, 30% 25%);
+  animation: steam 1.6s steps(6, end) infinite; }
+.steam.s1 { left: 33%; animation-delay: .7s; } .steam.s2 { left: 48%; animation-delay: 1.05s; } .steam.s3 { left: 62%; animation-delay: .85s; }
+@keyframes steam { 0% { opacity: 0; transform: translateY(10px); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateY(-26px); } }
+/* the name in the game's font: white with a black outline, a step shadow under it */
+.intro-name { margin: 0; display: grid; justify-items: center; gap: 4px; font-family: var(--font-display); font-weight: 700; color: #fff; text-align: center; line-height: 1;
+  text-shadow: 3px 0 0 #000, -3px 0 0 #000, 0 3px 0 #000, 0 -3px 0 #000, 3px 3px 0 #000, -3px 3px 0 #000, 3px -3px 0 #000, -3px -3px 0 #000, 0 7px 0 rgba(0, 0, 0, .45);
+  animation: namePop .4s steps(4, end) .5s both; visibility: hidden; }
+.intro-name.ready { visibility: visible; }
+.intro-name b { font-size: clamp(18px, 5.4vw, 40px); letter-spacing: .05em; white-space: nowrap; }
+.intro-name small { font-size: clamp(13px, 3.6vw, 26px); letter-spacing: .3em; padding-left: .3em; }
+@keyframes namePop { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .intro-emp { animation: introFade .5s both; } .intro-name { animation: introFade .5s .3s both; } .steam { animation-duration: 2.4s; } }
+@keyframes introFade { from { opacity: 0; } to { opacity: 1; } }
 </style>
 <div id="app">
+  <div id="intro" class="intro" role="img" aria-label="Empanada de Pollo Inc.">
+    <div class="intro-logo">
+      <div class="intro-emp" id="intro-emp"><i class="steam s1"></i><i class="steam s2"></i><i class="steam s3"></i></div>
+      <p class="intro-name" id="intro-name"><b>EMPANADA DE POLLO</b><small>INC.</small></p>
+    </div>
+  </div>
   <div id="stage">
     <canvas id="cv" role="img" aria-label="Vista en primera persona: mirás tus pies mientras caminás y pateás una piedrita"></canvas>
     <div id="fx" aria-hidden="true"></div>
@@ -8153,6 +8189,52 @@ if (location.hostname === 'localhost') window.__pp = { EZE, newMaestra, get TIP(
     const log = VOX.log; VOX.log = null;
     return { errs, log, per: per.map(v => v.toFixed(2)).join(' '), peak: pk.toFixed(3), rms: Math.sqrt(s2 / d.length).toFixed(4), voices: Object.keys(VOX_IDX).map(k => k + ':' + Object.keys(VOX_IDX[k]).length).join(' ') };
   } };
+// ---------- the intro every time the game opens: Empanada de Pollo Inc. ----------
+// the empanada in pixel art: a golden half-moon with its braided edge (the repulgue), a shine, a few baked spots, a dark outline
+const empanadaSVG = function empanadaSVG() {
+  const GW = 34, GH = 20, cx = 17, base = 16, rx = 15.6, ry = 14.2;
+  const C = { o: '#4a2a12', sep: '#8a4a1c', d: '#c27a34', m: '#dc933f', l: '#eeb35a', h: '#f8d27c', bl: '#f4c672', bd: '#c47c36', u: '#9c5a26', s: '#b06a2c' };
+  const shape = (x, y) => {   // 0 outside, 1 the dome, 2 the thickness underneath
+    const px = x + 0.5, py = y + 0.5, u = (px - cx) / rx;
+    if (py <= base) { const v = (py - base) / ry; return u * u + v * v <= 1 ? 1 : 0; }
+    if (py <= base + 3) return Math.abs(u) <= 0.97 - (py - base) * 0.035 ? 2 : 0;
+    return 0;
+  };
+  let s = '<svg viewBox="0 0 ' + GW + ' ' + GH + '" shape-rendering="crispEdges" aria-hidden="true">';
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+    const k = shape(x, y); if (!k) continue;
+    let c;
+    if (!shape(x - 1, y) || !shape(x + 1, y) || !shape(x, y - 1) || !shape(x, y + 1)) c = C.o;
+    else if (k === 2) c = y === base ? C.sep : C.u;
+    else {
+      const u = (x + 0.5 - cx) / rx, v = (y + 0.5 - base) / ry, r = Math.sqrt(u * u + v * v);
+      if (r > 0.76) {   // the repulgue: a twisted braid all along the curved edge
+        const a = Math.atan2(-v, u) / (Math.PI / 12), t = a - Math.floor(a) + (r - 0.76) * 1.6;
+        c = (t % 1) < 0.18 ? C.sep : (t % 1) < 0.62 ? C.bl : C.bd;
+      } else {
+        c = C.m;
+        if (u < -0.12 && v < -0.42) c = C.l;   // shine toward the top-left
+        if (u < -0.28 && v < -0.58 && r < 0.68) c = C.h;
+        if (v > -0.16) c = C.d;                // darker toward the bottom
+        if (h2(x * 3 + 7, y * 5 + 2) > 0.9 && r < 0.68 && v < -0.2 && c !== C.h) c = C.s;   // baked spots
+      }
+    }
+    s += '<rect x="' + x + '" y="' + y + '" width="1.04" height="1.04" fill="' + c + '"/>';
+  }
+  return s + '</svg>';
+}
+const introRun = function introRun() {
+  const el = $('intro'); if (!el) return;
+  $('intro-emp').insertAdjacentHTML('afterbegin', empanadaSVG());
+  // the name waits for the game's pixel font (never shown in a stand-in font)
+  const name = $('intro-name'), show = () => name.classList.add('ready');
+  if (document.fonts && document.fonts.load) Promise.race([document.fonts.load('700 30px Silkscreen'), new Promise((r) => setTimeout(r, 900))]).then(show, show); else show();
+  let done = false;
+  const end = () => { if (done) return; done = true; el.classList.add('out'); setTimeout(() => el.remove(), 480); };
+  setTimeout(end, 2600);
+  el.addEventListener('pointerdown', end);   // a tap skips it
+}
+introRun();
 const boot = function boot() {
   $('loading').hidden = true; $('btn-play').hidden = false; $('btn-shop').hidden = false;   // the game is ready to play
   resize();
